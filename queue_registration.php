@@ -106,11 +106,11 @@
 		flex-direction: column;
 	}
 </style>
-<?php include "admin/db_connect.php" ?>
 <a href="index.php" class="btn btn-sm  btn-success" style="background: #1592d1; color: #fff;"><i class="fa fa-home"></i> Home</a>
 <div class="close-btn">
 	<button id="close-btn">x</button>
 </div>
+
 
 <div class="left-side">
 	<div class="col-md-10">
@@ -126,10 +126,11 @@
 						<div id="t-container">
 							<?php
 							$trans = $conn->query("SELECT * FROM transactions where status = 1 AND active = 'on' order by name asc");
+							
 							while ($row = $trans->fetch_assoc()) :
 							?>
 								<option value=""></option>
-								<button type="button" class="btn m-btn transaction-c" data-tid="<?php echo $row['id'] ?>" data-symbol="<?php echo $row['symbol'] ?>"><?php echo $row['name'] ?></button>
+								<button type="button" class="btn m-btn transaction-c" data-tid="<?= $row['id'] ?>" data-symbol="<?= $row['symbol'] ?>" data-numberfrom="<?php echo $row['numberFrom']?>" data-numberto="<?php echo $row['numberTo']?>"><?= $row['name'] ?></button>
 							<?php endwhile; ?>
 						</div>
 						<div id="x-container" style="display: none;">
@@ -140,10 +141,9 @@
 								<option value=""></option>
 								<button type="button" class="btn transaction-x" data-tid="<?php echo $row['id'] ?>"><?php echo $row['name'] ?></button>
 							<?php endwhile; ?>
-						</div>
+						</div>-
 					</div>
 					<div id="printDiv" style="display: none;">
-
 					</div>
 				</div>
 			</div>
@@ -165,9 +165,10 @@
 		var data = {
 			transaction_id: button.data('tid'),
 			transaction_symbol: button.data('symbol'),
+			transaction_numberfrom: button.data('numberfrom'),
+			transaction_numberto: button.data('numberto'),
 		};
-
-		start_load();
+		//start_load();
 
 		$.ajax({
 			url: 'admin/ajax.php?action=save_queue',
@@ -179,6 +180,7 @@
 				end_load();
 			},
 			success: function(resp) {
+				console.log(resp);
 				if (resp > 0) {
 					end_load();
 					alert_toast("Queue Registered Successfully", 'success');

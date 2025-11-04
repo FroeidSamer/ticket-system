@@ -205,8 +205,8 @@ $trans = $conn->query("SELECT * FROM transaction_windows where status = 1 order 
 ?>
 
 <div class="full-container">
+    <!--<audio controls autoplay style="display:none"><source src="tts/audios/test.mp3"/></audio>-->
     <div class="left-side">
-
         <div class="container pl-0">
             <div>
                 <h3 class="text-center"><b>يتم الأن خدمة صاحب التذكرة رقم</b></h3>
@@ -268,7 +268,7 @@ $trans = $conn->query("SELECT * FROM transaction_windows where status = 1 order 
 </div>
 
 
-<script>
+<script type="text/javascript">
     var slides = <?php echo json_encode($slides) ?>;
     var scount = slides.length;
     if (scount > 0) {
@@ -323,7 +323,7 @@ $trans = $conn->query("SELECT * FROM transaction_windows where status = 1 order 
 
     }
 </script>
-<script>
+<script type="text/javascript">
     $(document).ready(function() {
 
         $('.singleCard').each(function() {

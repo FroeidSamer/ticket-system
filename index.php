@@ -4,14 +4,10 @@
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-
-  <title> نظام أرقام الإنتظار الالى</title>
-
-
   <?php
   include 'header.php'
   ?>
-
+  <title>نظام أرقام الإنتظار</title>
 </head>
 <style>
   body {
@@ -68,7 +64,7 @@
     </div>
   </div>
   <main id="" class="mt-4 mb-4">
-
+    <?php include 'admin/db_connect.php' ?>
     <?php 
     $page = isset($_GET['page']) ? $_GET['page'] : 'home';
     $allowed_pages = ['home', 'display', 'queue_print', 'queue_registration', 'waiting', 'all', 'exit_dialog'];
@@ -78,7 +74,6 @@
         include 'home.php';
     }
     ?>
-
   </main>
 
   <div id="preloader"></div>

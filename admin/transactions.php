@@ -97,16 +97,24 @@
                             <textarea name="name" id="" cols="30" rows="2" class="form-control" required></textarea>
                         </div>
                         <div class="form-group">
-                            <label class="control-label"><?= tr('symbol') ?></label>
-                            <input type="text" name="symbol" id="symbol" class="form-control">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label class="control-label flex-grow-1"><?= tr('symbol') ?></label>
+                                <label class="control-label flex-grow-1"><?= tr('numberFrom') ?></label>
+                                <label class="control-label"><?= tr('numberTo') ?></label>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <input type="text" name="symbol" id="symbol" class="form-control">
+                                <input type="text" name="numberFrom" id="numberFrom" class="form-control">
+                                <input type="text" name="numberTo" id="numberTo" class="form-control">
+                            </div>
                         </div>
                         <div class="form-group">
                             <label class="control-label"><?= tr('type') ?></label>
                             <select name="type" class="form-control" required>
                                 <option value=""><?= tr('select_type') ?></option>
-                                <option value="sorting">فرز</option>
-                                <option value="doctor">طبيب</option>
-                                <option value="notes">ملاحظة</option>
+                                <option value="sorting"><?=tr('فرز')?></option>
+                                <option value="doctor"><?=tr('طبيب')?></option>
+                                <option value="notes"><?=tr('ملاحظة')?></option>
                             </select>
                         </div>
                         <div class="form-check form-switch mb-3">
@@ -142,6 +150,8 @@
                                 <th class="text-center"><?= tr('sectionName') ?></th>
                                 <th class="text-center"><?= tr('type') ?></th>
                                 <th class="text-center"><?= tr('symbol') ?></th>
+                                <th class="text-center"><?= tr('numberFrom') ?></th>
+                                <th class="text-center"><?= tr('numberTo') ?></th>
                                 <th class="text-center"><?= tr('options') ?></th>
                             </tr>
                         </thead>
@@ -154,18 +164,18 @@
                                 <tr>
                                     <td class="text-center"><?php echo $i++ ?></td>
                                     <td class="">
-                                        <p> <b><?php echo $row['name'] ?></b></p>
+                                        <p> <b><?php echo tr($row['name']) ?></b></p>
                                     </td>
                                     <td class="text-center">
                                         <?php switch ($row['type']) {
                                             case 'sorting':
-                                                echo 'فرز';
+                                                echo tr('فرز');
                                                 break;
                                             case 'doctor':
-                                                echo 'طبيب';
+                                                echo tr('طبيب');
                                                 break;
                                             case 'notes':
-                                                echo 'ملاحظة';
+                                                echo tr('ملاحظة');
                                                 break;
                                             default:
                                                 break;
@@ -176,18 +186,26 @@
                                         <?php echo $row['symbol'] ?>
                                     </td>
                                     <td class="text-center">
+                                        <?php echo $row['numberFrom'] ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php echo $row['numberTo'] ?>
+                                    </td>
+                                    <td class="text-center w-50">
                                         <button class="btn btn-sm btn-primary edit_transaction" type="button"
                                             data-id="<?php echo $row['id'] ?>"
-                                            data-name="<?php echo $row['name'] ?>"
+                                            data-name="<?php echo tr($row['name']) ?>"
                                             data-priority="<?php echo $row['priority'] ?>"
                                             data-symbol="<?php echo $row['symbol'] ?>"
+                                            data-numberFrom="<?php echo $row['numberFrom'] ?>"
+                                            data-numberTo="<?php echo $row['numberTo'] ?>"
                                             data-type="<?php echo $row['type'] ?>">
                                             <?= tr('edit') ?>
                                         </button>
                                         <?php if ($row['active'] == 'on') : ?>
-                                            <button class=" btn btn-sm btn-success enable_transaction" type="button" data-id="<?php echo $row['id'] ?>"><?= tr('show') ?></button>
+                                            <button class=" btn btn-sm btn-secondary enable_transaction" type="button" data-id="<?php echo $row['id'] ?>"><?= tr('hide') ?></button>
                                         <?php else : ?>
-                                            <button class="btn btn-sm btn-secondary enable_transaction" type="button" data-id="<?php echo $row['id'] ?>"><?= tr('hide') ?></button>
+                                            <button class="btn btn-sm btn-success enable_transaction" type="button" data-id="<?php echo $row['id'] ?>"><?= tr('show') ?></button>
                                         <?php endif; ?>
                                         <button class="btn btn-sm btn-danger delete_transaction" type="button" data-id="<?php echo $row['id'] ?>"><?= tr('delete') ?></button>
                                     </td>
@@ -239,7 +257,14 @@
                 } else if (resp == 2) {
                     $('#msg').html("<div class='alert alert-danger'>Name or Symbol already exist.</div>")
                     end_load()
-                } else {
+                }else if (resp == 3) {
+                    $('#msg').html("<div class='alert alert-danger'>NumberFrom less than zero.</div>")
+                    end_load()
+                }else if (resp == 4) {
+                    $('#msg').html("<div class='alert alert-danger'>NumberTo less than NumberFrom.</div>")
+                    end_load()
+                }  
+                else {
                     $('#msg').html("<div class='alert alert-danger'>Error: " + resp + "</div>")
                     end_load()
                 }
@@ -258,6 +283,8 @@
         cat.find("[name='id']").val($(this).attr('data-id'))
         cat.find("[name='name']").val($(this).attr('data-name'))
         cat.find("[name='symbol']").val($(this).attr('data-symbol'))
+        cat.find("[name='numberFrom']").val($(this).attr('data-numberFrom'))
+        cat.find("[name='numberTo']").val($(this).attr('data-numberTo'))
         cat.find("[name='type']").val($(this).attr('data-type'))
         if ($(this).attr('data-priority') == 'on') {
             cat.find("[name='priority']").prop('checked', true);

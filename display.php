@@ -121,13 +121,14 @@ function nserving()
 					id: '<?php echo $_GET['id'] ?>'
 				},
 				success: function(resp) {
-
 					resp = JSON.parse(resp)
-					$('#squeue').html(resp.data.tsymbol + resp.data.queue_no)
+					if (resp.status == 1) {
+						$('#squeue').html(resp.data.tsymbol + resp.data.queue_no)
+					}
 				}
 			})
 
-		}, 1500)
+		}, 1500);
 		var renderTranss = setInterval(function() {
 			location.reload()
 		}, 60000);

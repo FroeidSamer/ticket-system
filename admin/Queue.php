@@ -18,12 +18,13 @@ class Queue
 
         try {
             $today = date("Y-m-d");
-
+            
             $stmt = $this->db->prepare("SELECT MAX(queue_no) as last_queue FROM queue_list WHERE DATE(created_timestamp) = ? FOR UPDATE");
             $stmt->bind_param("s", $today);
             $stmt->execute();
             $result = $stmt->get_result();
             $last_queue = $result->fetch_assoc()['last_queue'];
+            
             $stmt->close();
 
             if ($last_queue === null) {

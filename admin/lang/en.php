@@ -140,6 +140,23 @@ $en_words = [
     'processing_completed' => 'Processing completed',
     'type' => 'Type',
     'select_type' => 'Select Type',
-    'period' => 'Period time for next button (seconds)'
+    'period' => 'Period time for next button (seconds)',
+    'numberFrom'=>'Number From',
+    'numberTo'=>'Number To',
+    'عيادة الفرز'=>'Sorting clinic',
+    'Sorting clinic'=>'Sorting clinic',
+    'عيادة الطبيب'=>'Doctor clinic',
+    'Doctor clinic'=>'Doctor clinic',
+    'Note section'=>'Note section',
+    'قسم الملاحظة'=>'Note section',
+
+    'Sorting'=>'Sorting',
+    'فرز'=>'Sorting',
+    'Doctor'=>'Doctor',
+    'طبيب'=>'Doctor',
+    'ملاحظة'=>'Note',
+    'Note'=>'Note'
 
 ];
+
+?>

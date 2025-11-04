@@ -29,10 +29,8 @@
         color: #fff;
     }
 </style>
-<?php include "admin/db_connect.php" ?>
 <?php
 $trans = $conn->query("SELECT * FROM transactions where status = 1 order by name asc");
-
 ?>
 <a href="index.php" class="btn btn-sm btn-success"><i class="fa fa-home"></i> Home</a>
 <div class="left-side">

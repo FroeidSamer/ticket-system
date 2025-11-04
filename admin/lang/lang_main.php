@@ -1,6 +1,7 @@
 <?php
 include 'ar.php';
 include 'en.php';
+
 function tr($key)
 {
     global $ar_words, $en_words;
@@ -20,3 +21,5 @@ function tr($key)
         return $key;
     }
 }
+
+?>

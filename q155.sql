@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: 01 نوفمبر 2025 الساعة 16:30
--- إصدار الخادم: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- Generation Time: Nov 04, 2025 at 10:02 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `file_uploads`
+-- Table structure for table `file_uploads`
 --
 
 CREATE TABLE `file_uploads` (
@@ -34,7 +34,7 @@ CREATE TABLE `file_uploads` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `file_uploads`
+-- Dumping data for table `file_uploads`
 --
 
 INSERT INTO `file_uploads` (`id`, `file_path`, `date_uploaded`) VALUES
@@ -53,7 +53,7 @@ INSERT INTO `file_uploads` (`id`, `file_path`, `date_uploaded`) VALUES
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `queue_list`
+-- Table structure for table `queue_list`
 --
 
 CREATE TABLE `queue_list` (
@@ -71,7 +71,7 @@ CREATE TABLE `queue_list` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `queue_list`
+-- Dumping data for table `queue_list`
 --
 
 INSERT INTO `queue_list` (`id`, `transaction_id`, `window_id`, `queue_no`, `status`, `type_id`, `transfered`, `recall`, `called_at`, `date_created`, `created_timestamp`) VALUES
@@ -80,12 +80,28 @@ INSERT INTO `queue_list` (`id`, `transaction_id`, `window_id`, `queue_no`, `stat
 (791, 1, 1, '1001', 1, 1, NULL, 0, '2025-10-22 09:38:54', '2025-10-22 12:38:14', '2025-10-22 12:38:58'),
 (792, 14, 0, '1001', 0, 1, 'عيادة الطبيب', 0, NULL, '2025-10-22 12:38:58', '2025-10-22 12:38:58'),
 (793, 1, 0, '1002', 0, NULL, NULL, 0, NULL, '2025-10-22 12:49:05', '2025-10-22 12:49:05'),
-(794, 1, 0, '1001', 0, NULL, NULL, 0, NULL, '2025-10-28 23:11:33', '2025-10-28 23:11:33');
+(794, 1, 0, '1001', 0, NULL, NULL, 0, NULL, '2025-10-28 23:11:33', '2025-10-28 23:11:33'),
+(795, 1, 0, '1001', 0, NULL, NULL, 0, NULL, '2025-11-01 20:06:18', '2025-11-01 20:06:18'),
+(796, 1, 1, '1001', 1, 2, NULL, 0, '2025-11-02 15:53:55', '2025-11-02 12:34:33', '2025-11-02 16:54:24'),
+(797, 1, 1, '1002', 1, 2, NULL, 0, '2025-11-02 15:54:34', '2025-11-02 15:16:03', '2025-11-02 20:20:28'),
+(798, 14, 0, '1001', 0, 2, 'عيادة الطبيب', 0, NULL, '2025-11-02 16:54:24', '2025-11-02 16:54:24'),
+(799, 14, 0, '1002', 0, 1, 'عيادة الطبيب', 0, NULL, '2025-11-02 20:20:00', '2025-11-02 20:20:00'),
+(800, 14, 0, '1002', 0, 2, 'عيادة الطبيب', 0, NULL, '2025-11-02 20:20:28', '2025-11-02 20:20:28'),
+(801, 1, 0, '1003', 0, NULL, NULL, 0, NULL, '2025-11-02 20:51:48', '2025-11-02 20:51:48'),
+(802, 1, 0, '1004', 0, NULL, NULL, 0, NULL, '2025-11-02 22:29:54', '2025-11-02 22:29:54'),
+(803, 1, 0, '1005', 0, NULL, NULL, 0, NULL, '2025-11-02 22:32:00', '2025-11-02 22:32:00'),
+(804, 1, 0, '1001', 0, NULL, NULL, 0, NULL, '2025-11-02 23:49:46', '2025-11-02 23:49:46'),
+(805, 1, 1, '1001', 1, NULL, NULL, 0, '2025-11-03 11:06:23', '2025-11-03 11:15:24', '2025-11-03 12:06:23'),
+(806, 1, 1, '1002', 1, NULL, NULL, 0, '2025-11-03 11:08:05', '2025-11-03 11:15:51', '2025-11-03 12:08:05'),
+(807, 1, 1, '1003', 1, 1, NULL, 0, '2025-11-03 11:09:26', '2025-11-03 11:16:10', '2025-11-03 18:20:48'),
+(808, 14, 19, '1003', 1, 1, 'عيادة الطبيب', 0, '2025-11-03 17:28:18', '2025-11-03 18:20:49', '2025-11-03 18:28:18'),
+(809, 1, 0, '1001', 0, NULL, NULL, 0, NULL, '2025-11-03 23:35:58', '2025-11-03 23:35:58'),
+(810, 1, 0, '1001', 0, NULL, NULL, 0, NULL, '2025-11-03 23:54:04', '2025-11-03 23:54:04');
 
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `settings`
+-- Table structure for table `settings`
 --
 
 CREATE TABLE `settings` (
@@ -102,7 +118,7 @@ CREATE TABLE `settings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `settings`
+-- Dumping data for table `settings`
 --
 
 INSERT INTO `settings` (`id`, `password`, `name`, `image`, `ticket_company`, `ticket_logo`, `ticket_date`, `ticket_note`, `note`, `period`) VALUES
@@ -111,7 +127,7 @@ INSERT INTO `settings` (`id`, `password`, `name`, `image`, `ticket_company`, `ti
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `staff_statistics`
+-- Table structure for table `staff_statistics`
 --
 
 CREATE TABLE `staff_statistics` (
@@ -121,7 +137,7 @@ CREATE TABLE `staff_statistics` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `staff_statistics`
+-- Dumping data for table `staff_statistics`
 --
 
 INSERT INTO `staff_statistics` (`id`, `staff_id`, `processed_at`) VALUES
@@ -300,12 +316,18 @@ INSERT INTO `staff_statistics` (`id`, `staff_id`, `processed_at`) VALUES
 (173, 4, '2025-09-01 16:09:36'),
 (174, 4, '2025-09-01 16:13:55'),
 (175, 4, '2025-10-16 17:43:24'),
-(176, 4, '2025-10-22 09:38:54');
+(176, 4, '2025-10-22 09:38:54'),
+(177, 4, '2025-11-02 14:53:55'),
+(178, 4, '2025-11-02 14:54:34'),
+(179, 4, '2025-11-03 10:06:23'),
+(180, 4, '2025-11-03 10:08:05'),
+(181, 4, '2025-11-03 10:09:26'),
+(182, 5, '2025-11-03 16:28:18');
 
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `status`
+-- Table structure for table `status`
 --
 
 CREATE TABLE `status` (
@@ -316,17 +338,17 @@ CREATE TABLE `status` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `status`
+-- Dumping data for table `status`
 --
 
 INSERT INTO `status` (`id`, `type`, `color`, `ordering`) VALUES
-(1, 'م', '#ff3300', '3'),
-(2, 'ب', '#00ff00', '4');
+(1, 'A', '#ff3300', '3'),
+(2, 'B', '#00ff00', '4');
 
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `transactions`
+-- Table structure for table `transactions`
 --
 
 CREATE TABLE `transactions` (
@@ -337,22 +359,24 @@ CREATE TABLE `transactions` (
   `active` enum('on','off') DEFAULT 'on',
   `priority` enum('on','off') NOT NULL,
   `symbol` varchar(1) DEFAULT NULL,
+  `numberFrom` int(11) NOT NULL DEFAULT 0,
+  `numberTo` int(11) NOT NULL DEFAULT 0,
   `type` varchar(225) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `transactions`
+-- Dumping data for table `transactions`
 --
 
-INSERT INTO `transactions` (`id`, `name`, `status`, `sorting`, `active`, `priority`, `symbol`, `type`) VALUES
-(1, 'عيادة الفرز', 1, 'off', 'on', 'on', '', 'sorting'),
-(14, 'عيادة الطبيب', 1, 'off', 'off', 'off', '', 'doctor'),
-(16, 'قسم الملاحظة', 1, 'off', 'off', 'off', '', 'notes');
+INSERT INTO `transactions` (`id`, `name`, `status`, `sorting`, `active`, `priority`, `symbol`, `numberFrom`, `numberTo`, `type`) VALUES
+(1, 'عيادة الفرز', 1, 'off', 'on', 'off', 'A', 100, 199, 'sorting'),
+(14, 'عيادة الطبيب', 1, 'off', 'off', 'off', 'B', 200, 299, 'doctor'),
+(16, 'قسم الملاحظة', 1, 'off', 'off', 'off', '', 0, 0, 'notes');
 
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `transaction_windows`
+-- Table structure for table `transaction_windows`
 --
 
 CREATE TABLE `transaction_windows` (
@@ -364,21 +388,21 @@ CREATE TABLE `transaction_windows` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `transaction_windows`
+-- Dumping data for table `transaction_windows`
 --
 
 INSERT INTO `transaction_windows` (`id`, `transaction_id`, `transaction_ids`, `name`, `status`) VALUES
 (1, NULL, '1', 'عيادة الفرز 1', 1),
 (19, NULL, '14', 'عيادة الطبيب 1', 1),
-(21, NULL, '16', 'قسم الملاحظة 1', 1),
+(21, NULL, '16', 'قسم الملاحظة 2', 1),
 (25, NULL, '1', 'عيادة الفرز 2', 1),
 (26, NULL, '14', 'عيادة الطبيب 2', 1),
-(27, NULL, NULL, 'قسم الملاحظة 2', 1);
+(27, NULL, '16', '1 قسم الملاحظة ', 1);
 
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -392,13 +416,13 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `users`
+-- Dumping data for table `users`
 --
 
 INSERT INTO `users` (`id`, `name`, `window_id`, `type`, `transfer`, `username`, `password`) VALUES
-(1, 'Administrator', 0, 1, 'yes', 'admin', '$2y$10$CEn5cqXOZ3eRjDHUBVgXRu5rP8VL8KmYATzCZvYdNmIoH4A216axm'),
-(4, 'عيادة الفرز 1', 1, 2, 'yes', 'ER1', '$2y$10$D3KebVwJFw3h6K7J.Er1f.isc9nLSQhQQjP5pYNKIrwDJMMB03PsS'),
-(5, 'عيادة الطبيب 1', 19, 2, 'yes', 'ER3', '$2y$10$Pn5dJOFufgA5AMMbn/S0s.BGc/zkM0hV9GQtrd1wHYKYqGAUNiYDG'),
+(1, 'Administrator', 0, 1, 'yes', 'admin', '$2y$10$8Lm7szkoAI77iKISxQlAGu9yvPSPTUUUX62454uWU/QLSAKORvlNG'),
+(4, 'عيادة الفرز 1', 1, 2, 'yes', 'ER1', '$2y$10$8Lm7szkoAI77iKISxQlAGu9yvPSPTUUUX62454uWU/QLSAKORvlNG'),
+(5, 'عيادة الطبيب 1', 19, 2, 'yes', 'ER3', '$2y$10$chFK2xvRPpjCTmaSDCGY8.jlHv4b0Cdc7gkLMZM0f7uRydLHp7Rqy'),
 (7, 'قسم الملاحظة A', 21, 2, 'no', 'ER5', '$2y$10$WY4TGY1lvnQ2w3DYKCai.OubI/lXXr2jd5Sr1M11Z02gBgnptjDMq'),
 (9, 'عيادة الفرز 2', 25, 2, 'no', 'er2', '$2y$10$viU2wej0xMkZb6WF.m01H.CBzk6y03Lb4Smmq3KarjGx40NKtYJOi'),
 (10, 'عيادة الطبيب 2', 26, 2, 'yes', 'er4', '$2y$10$vKkeX7kaSywNVRdH6FOgrOjctBQ3B3lg7Jybj19UM7/cGT9kQ8AX2'),
@@ -407,7 +431,7 @@ INSERT INTO `users` (`id`, `name`, `window_id`, `type`, `transfer`, `username`, 
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `user_permissions`
+-- Table structure for table `user_permissions`
 --
 
 CREATE TABLE `user_permissions` (
@@ -417,7 +441,7 @@ CREATE TABLE `user_permissions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `user_permissions`
+-- Dumping data for table `user_permissions`
 --
 
 INSERT INTO `user_permissions` (`id`, `user_id`, `transaction_id`) VALUES
@@ -428,7 +452,7 @@ INSERT INTO `user_permissions` (`id`, `user_id`, `transaction_id`) VALUES
 -- --------------------------------------------------------
 
 --
--- بنية الجدول `waiting_stats`
+-- Table structure for table `waiting_stats`
 --
 
 CREATE TABLE `waiting_stats` (
@@ -444,7 +468,7 @@ CREATE TABLE `waiting_stats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- إرجاع أو استيراد بيانات الجدول `waiting_stats`
+-- Dumping data for table `waiting_stats`
 --
 
 INSERT INTO `waiting_stats` (`id`, `queue_id`, `transaction_id`, `status_id`, `arrival_time`, `start_time`, `end_time`, `waiting_duration`, `service_duration`) VALUES
@@ -535,7 +559,23 @@ INSERT INTO `waiting_stats` (`id`, `queue_id`, `transaction_id`, `status_id`, `a
 (124, 791, 1, NULL, '2025-10-22 12:38:14', '2025-10-22 12:38:54', '2025-10-22 12:38:58', 40, 4),
 (125, 792, 14, NULL, '2025-10-22 12:38:58', NULL, NULL, NULL, NULL),
 (126, 793, 1, NULL, '2025-10-22 12:49:05', NULL, NULL, NULL, NULL),
-(127, 794, 1, NULL, '2025-10-28 23:11:33', NULL, NULL, NULL, NULL);
+(127, 794, 1, NULL, '2025-10-28 23:11:33', NULL, NULL, NULL, NULL),
+(128, 795, 1, NULL, '2025-11-01 20:06:18', NULL, NULL, NULL, NULL),
+(129, 796, 1, NULL, '2025-11-02 12:34:33', '2025-11-02 16:53:55', '2025-11-02 16:54:24', 15562, 29),
+(130, 797, 1, NULL, '2025-11-02 15:16:03', '2025-11-02 16:54:34', '2025-11-02 20:20:00', 5911, 12326),
+(131, 798, 14, NULL, '2025-11-02 16:54:24', NULL, NULL, NULL, NULL),
+(132, 799, 14, NULL, '2025-11-02 20:20:00', NULL, NULL, NULL, NULL),
+(133, 800, 14, NULL, '2025-11-02 20:20:29', NULL, NULL, NULL, NULL),
+(134, 801, 1, NULL, '2025-11-02 20:51:48', NULL, NULL, NULL, NULL),
+(135, 802, 1, NULL, '2025-11-02 22:29:54', NULL, NULL, NULL, NULL),
+(136, 803, 1, NULL, '2025-11-02 22:32:00', NULL, NULL, NULL, NULL),
+(137, 804, 1, NULL, '2025-11-02 23:49:46', NULL, NULL, NULL, NULL),
+(138, 805, 1, NULL, '2025-11-03 11:15:25', '2025-11-03 12:06:23', NULL, NULL, NULL),
+(139, 806, 1, NULL, '2025-11-03 11:15:51', '2025-11-03 12:08:05', NULL, NULL, NULL),
+(140, 807, 1, NULL, '2025-11-03 11:16:10', '2025-11-03 12:09:26', '2025-11-03 18:20:49', 3196, 22283),
+(141, 808, 14, NULL, '2025-11-03 18:20:49', '2025-11-03 18:28:19', '2025-11-03 18:28:58', 450, 39),
+(142, 809, 1, NULL, '2025-11-03 23:35:58', NULL, NULL, NULL, NULL),
+(143, 810, 1, NULL, '2025-11-03 23:54:04', NULL, NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -622,7 +662,7 @@ ALTER TABLE `file_uploads`
 -- AUTO_INCREMENT for table `queue_list`
 --
 ALTER TABLE `queue_list`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=795;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=811;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -634,7 +674,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `staff_statistics`
 --
 ALTER TABLE `staff_statistics`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=183;
 
 --
 -- AUTO_INCREMENT for table `status`
@@ -658,7 +698,7 @@ ALTER TABLE `transaction_windows`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `user_permissions`
@@ -670,26 +710,26 @@ ALTER TABLE `user_permissions`
 -- AUTO_INCREMENT for table `waiting_stats`
 --
 ALTER TABLE `waiting_stats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=128;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
 
 --
--- قيود الجداول المُلقاة.
+-- Constraints for dumped tables
 --
 
 --
--- قيود الجداول `queue_list`
+-- Constraints for table `queue_list`
 --
 ALTER TABLE `queue_list`
   ADD CONSTRAINT `type_cons` FOREIGN KEY (`type_id`) REFERENCES `status` (`id`);
 
 --
--- قيود الجداول `transaction_windows`
+-- Constraints for table `transaction_windows`
 --
 ALTER TABLE `transaction_windows`
   ADD CONSTRAINT `fk_cons` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE CASCADE;
 
 --
--- قيود الجداول `user_permissions`
+-- Constraints for table `user_permissions`
 --
 ALTER TABLE `user_permissions`
   ADD CONSTRAINT `con1` FOREIGN KEY (`transaction_id`) REFERENCES `transactions` (`id`) ON DELETE CASCADE,
