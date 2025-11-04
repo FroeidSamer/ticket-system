@@ -199,6 +199,27 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                     </div>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBackup"
+                        aria-expanded="false" aria-controls="collapseBackup">
+                        <i class="fas fa-fw fa-database"></i>
+                        <span>الصيانة</span>
+                    </a>
+                    <div id="collapseBackup" class="collapse" aria-labelledby="headingBackup" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <h6 class="collapse-header">نسخ احتياطي:</h6>
+                            <a href="#" class="collapse-item" id="exportLink" onclick="exportDatabase(event)">
+                                <i class="fas fa-database"></i> تصدير قاعدة البيانات SQL
+                            </a>
+                            <h6 class="collapse-header">عداد الارقام:</h6>
+                            <a href="#" class="collapse-item" id="exportLink" onclick="(event)">
+                                <i class="fas fa-database"></i> تصفير العداد
+                            </a>
+                        </div>
+                    </div>
+                </li>
+
+
 
                 <!-- Divider -->
                 <hr class="sidebar-divider d-none d-md-block">
@@ -274,3 +295,33 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+
+                    <script>
+                        function exportDatabase(event) {
+                            event.preventDefault(); // prevent link navigation
+
+                            const btn = document.getElementById('exportLink');
+                            const originalText = btn.innerHTML;
+
+                            if (!confirm('هل تريد تصدير قاعدة البيانات كاملة؟\n\nسيتم تحميل ملف SQL يحتوي على:\n✓ جميع الجداول\n✓ جميع البيانات\n✓ الهيكل الكامل للقاعدة')) {
+                                return;
+                            }
+
+                            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التصدير... الرجاء الانتظار';
+                            btn.style.pointerEvents = 'none';
+
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = 'export_database.php';
+                            form.style.display = 'none';
+
+                            document.body.appendChild(form);
+                            form.submit();
+
+                            setTimeout(() => {
+                                btn.innerHTML = originalText;
+                                btn.style.pointerEvents = 'auto';
+                                document.body.removeChild(form);
+                            }, 3000);
+                        }
+                    </script>

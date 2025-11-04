@@ -61,7 +61,6 @@ $en_words = [
     'ticketNo' => 'Ticket No',
     'statue' => 'Statue',
     'time' => 'Time',
-    'waiting' => 'Waiting',
     'waitForExamination' => 'Waiting For Examination',
     'referrals' => 'Referrals',
     'addCompanyName' => 'Add company name',
@@ -89,10 +88,15 @@ $en_words = [
     'priority' => 'Priority',
     'symbol' => 'Symbol',
     'custom_call' => 'Custom Call',
-    'call' => 'Call',
-    'recall' => 'ReCall',
     'enter_card' => 'Enter Card Number',
     'waitingTime' => 'Waiting time',
+    'active_staff' => 'Active Staff',
+    'avg_daily' => 'Avg Daily',
+    'daily_processing_activity' => 'Daily Processing Activity',
+    'staff_performance_overview' => 'Staff Performance Overview',
+    'staff_performance_details' => 'Staff Performance Details',
+    'staff_name' => 'Staff Name',
+    'total_processed' => 'Total Processed',
     // Page titles and headers
     'user_statistics' => 'User Statistics',
     'user' => 'User',
@@ -112,6 +116,8 @@ $en_words = [
     'start_date' => 'Start Date',
     'end_date' => 'End Date',
     'update_stats' => 'Update Stats',
+    'Update_Charts' => 'Update Charts',
+    'Download_Excel' => 'Download Excel',
 
     // Performance indicators
     'activity_rate' => 'Activity Rate',
@@ -141,22 +147,20 @@ $en_words = [
     'type' => 'Type',
     'select_type' => 'Select Type',
     'period' => 'Period time for next button (seconds)',
-    'numberFrom'=>'Number From',
-    'numberTo'=>'Number To',
-    'عيادة الفرز'=>'Sorting clinic',
-    'Sorting clinic'=>'Sorting clinic',
-    'عيادة الطبيب'=>'Doctor clinic',
-    'Doctor clinic'=>'Doctor clinic',
-    'Note section'=>'Note section',
-    'قسم الملاحظة'=>'Note section',
+    'numberFrom' => 'Number From',
+    'numberTo' => 'Number To',
+    'عيادة الفرز' => 'Sorting clinic',
+    'Sorting clinic' => 'Sorting clinic',
+    'عيادة الطبيب' => 'Doctor clinic',
+    'Doctor clinic' => 'Doctor clinic',
+    'Note section' => 'Note section',
+    'قسم الملاحظة' => 'Note section',
 
-    'Sorting'=>'Sorting',
-    'فرز'=>'Sorting',
-    'Doctor'=>'Doctor',
-    'طبيب'=>'Doctor',
-    'ملاحظة'=>'Note',
-    'Note'=>'Note'
+    'Sorting' => 'Sorting',
+    'فرز' => 'Sorting',
+    'Doctor' => 'Doctor',
+    'طبيب' => 'Doctor',
+    'ملاحظة' => 'Note',
+    'Note' => 'Note'
 
 ];
-
-?>
