@@ -1,430 +1,435 @@
-<style>
-    body {
-        /* background: url(admin/assets/img/main-bg.jpg);
-        background-repeat: no-repeat;
-        background-size: cover; */
-        background: #fff;
-    }
-
-    main {
-        height: 90vh;
-    }
-
-    h3 {
-        font-size: 1.5rem
-    }
-
-    .full-container {
-        width: 100%;
-        height: 100%;
-        display: flex;
-    }
-
-    .left-side {
-        background: url(admin/assets/img/green-engraving-r.png);
-        background-repeat: no-repeat;
-        background-size: cover;
-        width: calc(50%);
-        height: calc(100%);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .left-side img {
-        width: 100%;
-    }
-
-    .singleCard {
-        position: relative;
-        display: flex;
-        align-items: center;
-        width: 100%;
-        height: 100px;
-        justify-content: space-between;
-        margin-bottom: 5px;
-        color: #fff;
-
-        border-radius: 0 10px 10px 0;
-
-    }
-
-    .singleCard p {
-        font-size: 20px;
-        font-weight: 900;
-        color: #fff;
-        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-
-    }
-
-    .singleCard h1 {
-        font-size: 4.5rem;
-        font-weight: 900;
-        color: #fff;
-        margin-left: 25px;
-        border-right: 1px solid white;
-        padding-right: 20px;
-    }
-
-    .singleCard p span {
-        margin: 0 10px;
-    }
-
-    .singleCard p #window {
-        font-size: 30px;
-    }
-
-    .singleCard p #squeue {
-        font-size: 40px;
-    }
-
-    .right-side {
-        background: url(admin/assets/img/green-engraving-l.png);
-        background-repeat: no-repeat;
-        background-size: cover;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        width: calc(50%);
-        height: calc(100%);
-        text-align: start;
-        padding-right: 25px;
-    }
-
-    .slideShow {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: calc(100%);
-        /* height: calc(100%); */
-        padding: auto;
-    }
-
-    .slideShow img,
-    .slideShow video {
-        max-width: calc(100%);
-        max-height: calc(100%);
-        opacity: 0;
-        transition: all .5s ease-in-out;
-        border-radius: 20px;
-
-    }
-
-    .slideShow video {
-        width: calc(100%);
-    }
-
-
-
-    .cards-container {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 5px;
-    }
-
-    .container-fluid {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .main-card {
-        position: relative;
-        height: 50px;
-        direction: rtl;
-        display: -ms-flexbox;
-        display: flex;
-        justify-content: space-around;
-        min-width: 0;
-        word-wrap: break-word;
-        background-color: #fff;
-        background-clip: border-box;
-        border: 1px solid rgba(0, 0, 0, .125);
-        border-radius: 10px;
-        margin: 5px;
-        text-align: right;
-    }
-
-    .main-card .card-body {
-        padding: 0.25rem;
-    }
-
-    .main-card h3 {
-        display: inline-block;
-    }
-
-    .main-card .main-head {
-        width: 100%;
-        text-align: center;
-        border: 1px solid black;
-        margin: 0 5px;
-        border-radius: 10px;
-        background-color: #85FFBD;
-    }
-
-    .card {
-        height: 75px;
-        box-shadow: 0px 10px 10px rosybrown;
-        margin: 5px;
-        border-radius: 50px;
-        direction: rtl;
-    }
-
-    a.btn.btn-sm.btn-success {
-        z-index: 99999;
-        background: #55608f;
-        border: none;
-    }
-
-    .company {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        z-index: 99999;
-        margin-bottom: 5px;
-        justify-content: space-between;
-    }
-
-    #company_image {
-        width: 120px;
-        height: 120px;
-    }
-
-    #company_title {
-        font-weight: 900;
-        color: #1592d1;
-        font-size: 40px;
-        text-shadow: -3px 3px #28a74575;
-        text-align: center;
-    }
-</style>
-<?php include "admin/db_connect.php" ?>
 <?php
-$trans = $conn->query("SELECT * FROM transaction_windows where status = 1 order by name asc");
-
+include "admin/db_connect.php";
 ?>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 
-<div class="full-container">
-    <!--<audio controls autoplay style="display:none"><source src="tts/audios/test.mp3"/></audio>-->
-    <div class="left-side">
-        <div class="container pl-0">
-            <div>
-                <h3 class="text-center"><b>يتم الأن خدمة صاحب التذكرة رقم</b></h3>
-            </div>
-
-            <?php
-            $colors_arr = ['#2E78DB', '#6AB2ED', '#9CD9F5', '#6AB2ED', '#2E78DB'];
-            $i = 1;
-            $j = 0;
-            while ($row = $trans->fetch_assoc()) :
-            ?>
-
-                <div class="singleCard" data-tid="<?= $row['transaction_id'] ?>" data-wid="<?= $row['id'] ?>" dir="rtl" style="
-                background-color: <?php
-                                    if (isset($colors_arr[$j])) {
-                                        echo $colors_arr[$j];
-                                        $j++;
-                                    } else {
-                                        $j = 0;
-                                        echo $colors_arr[$j];
-                                        $j++;
-                                    }
-                                    ?>">
-                    <p><span id="window"></span>&lAarr;<span id="squeue"></span></p>
-                    <h1><?= $i++ ?></h1>
-                </div>
-            <?php endwhile; ?>
-
-        </div>
-    </div>
-
-    <div class="right-side">
-        <div class="company">
-            <img src="<?php echo isset($_SESSION['setting_image']) ? 'admin/assets/img/' . $_SESSION['setting_image'] : 'admin/assets/img/logo.jpg' ?>" alt="" id="company_image">
-            <p id="company_title"><?php echo isset($_SESSION['setting_name']) ?  $_SESSION['setting_name'] : 'Transaction Queuing System' ?></p>
-        </div>
-        <?php
-        $uploads = $conn->query("SELECT * FROM file_uploads order by rand() ");
-        $slides = array();
-        while ($row = $uploads->fetch_assoc()) {
-            $slides[] = $row['file_path'];
+<head>
+    <meta charset="utf-8">
+    <title>شاشة الطابور</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <style>
+        :root {
+            --blue-dark: #003a77;
+            --blue-soft: #e9f4ff;
+            --accent: #1e64cc;
         }
-        ?>
-        <div class="slideShow">
 
-        </div>
-    </div>
-</div>
-<div id="x-container" style="display: none;">
+        body {
+            margin: 0;
+            font-family: "Cairo", sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        .full-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        /* الجدول على اليمين */
+        .left-side {
+            width: 58%;
+            padding: 20px;
+            background: var(--blue-soft);
+            overflow: auto;
+            order: 2;
+        }
+
+        .title-box {
+            text-align: right;
+            margin-bottom: 12px;
+        }
+
+        .title-box h3 {
+            margin: 0;
+            color: var(--blue-dark);
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .queue-table-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        }
+
+        table.queue-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            direction: rtl;
+        }
+
+        table.queue-table thead th {
+            background: var(--accent);
+            color: #fff;
+            padding: 12px 10px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        table.queue-table tbody td {
+            padding: 14px 8px;
+            font-size: 20px;
+            border-bottom: 1px solid #eef4fb;
+        }
+
+        table.queue-table tbody tr:nth-child(even) {
+            background: #fbfdff;
+        }
+
+        .clinic-name {
+            text-align: right;
+            font-weight: 700;
+        }
+
+        /* اللوجو + السلايدر على اليسار */
+        .right-side {
+            width: 42%;
+            padding: 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            box-sizing: border-box;
+            order: 1;
+        }
+
+        .company {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        #company_image {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        }
+
+        #company_title {
+            font-size: 30px;
+            color: var(--blue-dark);
+            font-weight: 800;
+            text-align: left;
+        }
+
+        .slideShow {
+            width: 100%;
+            height: 300px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 90px;
+        }
+
+        .slideShow img,
+        .slideShow video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* تحسين الاستجابة للشاشات الصغيرة */
+        @media(max-width:1200px) {
+            .left-side {
+                width: 40%;
+            }
+
+            .right-side {
+                width: 60%;
+            }
+        }
+
+        @media(max-width:900px) {
+            .full-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .left-side,
+            .right-side {
+                width: 100%;
+                order: unset;
+            }
+
+            .slideShow {
+                width: 100%;
+                height: 220px;
+            }
+
+            #company_image {
+                width: 120px;
+                height: 120px;
+            }
+
+            #company_title {
+                font-size: 24px;
+            }
+
+            table.queue-table tbody td {
+                font-size: 18px;
+                padding: 12px 6px;
+            }
+
+            table.queue-table thead th {
+                font-size: 16px;
+                padding: 10px 5px;
+            }
+        }
+
+        @media(max-width:600px) {
+            .slideShow {
+                height: 180px;
+            }
+
+            #company_image {
+                width: 100px;
+                height: 100px;
+            }
+
+            #company_title {
+                font-size: 20px;
+            }
+
+            table.queue-table tbody td {
+                font-size: 16px;
+                padding: 10px 4px;
+            }
+
+            table.queue-table thead th {
+                font-size: 14px;
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
     <?php
-    // $trans = $conn->query("SELECT * FROM transactions where status = 1 order by name asc");
-    $trans = $conn->query("SELECT * FROM transaction_windows where status = 1 order by name asc");
-
-    while ($row = $trans->fetch_assoc()) :
-    ?>
-        <option value=""></option>
-        <button type="button" class="btn transaction-x" data-tid="<?php echo $row['id'] ?>"><?php echo $row['name'] ?></button>
-    <?php endwhile; ?>
-</div>
-
-
-<script type="text/javascript">
-    var slides = <?php echo json_encode($slides) ?>;
-    var scount = slides.length;
-    if (scount > 0) {
-        $(document).ready(function() {
-            render_slides(0)
-        })
+    $tw_res = $conn->query("SELECT * FROM transaction_windows WHERE status = 1 ORDER BY name ASC");
+    $windows = [];
+    while ($r = $tw_res->fetch_assoc()) {
+        $windows[] = $r;
     }
 
-    function render_slides(k) {
-        if (k >= scount)
-            k = 0;
-        var src = slides[k]
-        k++;
-        var t = src.split('.');
-        var file;
-        t = t[1];
-        if (t == 'webm' || t == "mp4") {
-            file = $("<video id='slide' src='admin/assets/uploads/" + src + "' onended='render_slides(" + k + ")' autoplay='true' muted='muted'></video>");
-        } else {
-            file = $("<img id='slide' src='admin/assets/uploads/" + src + "' onload='slideInterval(" + k + ")' />");
-        }
-        //console.log(file)
-        if ($('#slide').length > 0) {
-            $('#slide').css({
-                "opacity": 0
-            });
-            setTimeout(function() {
-                $('.slideShow').html('');
-                $('.slideShow').append(file)
+    $uploads = $conn->query("SELECT * FROM file_uploads ORDER BY rand()");
+    $slides = [];
+    while ($row = $uploads->fetch_assoc()) {
+        $slides[] = $row['file_path'];
+    }
+
+    $company_image = isset($_SESSION['setting_image']) ? 'admin/assets/img/' . $_SESSION['setting_image'] : 'admin/assets/img/logo.jpg';
+    $company_title = isset($_SESSION['setting_name']) ? $_SESSION['setting_name'] : 'Transaction Queuing System';
+    ?>
+
+    <div class="full-container">
+
+        <!-- جدول الطوابير -->
+        <div class="left-side">
+            <div class="title-box">
+                <h3>يتم الآن خدمة أصحاب الأدوار</h3>
+            </div>
+            <div class="queue-table-box">
+                <table class="queue-table">
+                    <thead>
+                        <tr>
+                            <th>اسـم العيـــادة</th>
+                            <th>رقـم الـــدور</th>
+                            <th>النــــوع</th>
+                            <th>الغـــرفــــة</th>
+                        </tr>
+                    </thead>
+                    <tbody id="queue-tbody">
+                        <?php foreach ($windows as $w): ?>
+                            <tr class="queue-row" data-wid="<?= htmlspecialchars($w['id']) ?>" data-tids="<?= htmlspecialchars($w['transaction_ids']) ?>">
+                                <td class="td-clinic clinic-name">-</td> <!-- بدل td-symbol -->
+                                <td class="td-queue">-</td>
+                                <td class="td-symbol">-</td> <!-- لو حابة تظهري النوع بعد كده -->
+                                <td class="td-window"><?= htmlspecialchars($w['name']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+        <!-- اللوجو و السلايدر -->
+        <div class="right-side">
+            <div class="company">
+                <div style="text-align:left;">
+                    <div id="company_title"><?= htmlspecialchars($company_title) ?></div>
+                </div>
+                <img id="company_image" src="<?= htmlspecialchars($company_image) ?>" alt="Logo">
+            </div>
+            <div class="slideShow" id="slideShow"></div>
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var slides = <?= json_encode($slides) ?>;
+        var scount = slides.length;
+
+        function render_slides(k) {
+            if (scount === 0) return;
+            if (k >= scount) k = 0;
+            var src = slides[k];
+            k++;
+            var ext = src.split('.').pop().toLowerCase();
+            var file;
+            if (ext === 'webm' || ext === 'mp4') {
+                file = $("<video id='slide' src='admin/assets/uploads/" + src + "' autoplay muted playsinline onended='render_slides(" + k + ")'></video>");
+            } else {
+                file = $("<img id='slide' src='admin/assets/uploads/" + src + "' onload='slideInterval(" + k + ")' />");
+            }
+            if ($('#slide').length > 0) {
+                $('#slide').css({
+                    "opacity": 0
+                });
+                setTimeout(function() {
+                    $('#slide').remove();
+                    $('.slideShow').append(file);
+                    $('#slide').css({
+                        "opacity": 1
+                    });
+                    if (ext === 'webm' || ext === 'mp4') $('video').trigger('play');
+                }, 400);
+            } else {
+                $('.slideShow').append(file);
                 $('#slide').css({
                     "opacity": 1
                 });
-                if (t == 'webm' || t == "mp4")
-                    $('video').trigger('play');
-
-
-            }, 500)
-        } else {
-            $('.slideShow').append(file)
-            $('#slide').css({
-                "opacity": 1
-            });
-
+            }
         }
 
-    }
+        function slideInterval(i = 0) {
+            setTimeout(function() {
+                render_slides(i);
+            }, 5000);
+        }
+        if (scount > 0) $(function() {
+            render_slides(0);
+        });
 
-    function slideInterval(i = 0) {
-        setTimeout(function() {
-            render_slides(i)
-        }, 5000)
-
-    }
-</script>
-<script type="text/javascript">
-    $(document).ready(function() {
-
-        $('.singleCard').each(function() {
-            var card = $(this);
-            var tid = card.data('tid');
-            var wid = card.data('wid');
-
-            var previousResponse;
-
-
-            var renderServe = setInterval(function() {
+        var previousPerRow = {};
+        var rows = $('.queue-row');
+        rows.each(function() {
+            var row = $(this);
+            var wid = row.data('wid');
+            var tids = row.data('tids');
+            previousPerRow[wid] = {
+                queue_no: '',
+                date_created: '',
+                tsymbol: ''
+            };
+            setInterval(function() {
                 $.ajax({
                     url: 'admin/ajax.php?action=get_queue',
-                    method: "POST",
+                    method: 'POST',
                     data: {
-                        id: tid,
+                        id: tids,
                         wid: wid
                     },
                     success: function(resp) {
                         try {
-                            parsedResp = JSON.parse(resp);
-                        } catch (error) {
-                            // Handle non-JSON response here
+                            var r = typeof resp === 'object' ? resp : JSON.parse(resp);
+                        } catch (e) {
                             return;
                         }
-                        resp = JSON.parse(resp);
-                        if (resp.status == 1) {
-                            card.find('#squeue').html(resp.data.tsymbol + resp.data.queue_no);
-                            card.find('#window').html(resp.data.wname);
+                        if (r.status == 1 && r.data) {
+                            var tsymbol = r.data.tsymbol || '';
+                            var qno = r.data.queue_no || '';
+                            var clinic = r.data.clinic_name || r.data.tname || '';
+                            var wname = r.data.wname || '';
+                            var date_created = r.data.date_created || r.data.created_timestamp || '';
 
-                            previousResponse = resp;
+                            row.find('.td-clinic').text(clinic ? clinic : '-'); // العمود الأول
+                            row.find('.td-queue').text(qno ? (tsymbol + ' - ' + qno) : '-'); // العمود الثاني
+                            row.find('.td-symbol').text(tsymbol ? tsymbol : '-'); // العمود الثالث (النوع)
+                            row.find('.td-window').text(wname ? wname : row.find('.td-window').text()); // الشباك
+
+                            if (qno && qno !== '0') {
+                                row.show();
+                            } else {
+                                row.hide();
+                            }
+
+                            row.data('date_created', date_created);
+
+                            var prev = previousPerRow[wid];
+                            if (prev.queue_no !== qno || prev.tsymbol !== tsymbol || prev.date_created !== date_created) {
+                                if (qno) {
+                                    var text = 'البطاقة رقم ' + tsymbol + ' ' + qno + '، برجاء التوجه إلى ' + clinic;
+                                    fetch('tts/tts.php', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/x-www-form-urlencoded'
+                                        },
+                                        body: 'text=' + encodeURIComponent(text)
+                                    }).catch(function(e) {
+                                        console.error(e);
+                                    });
+                                    previousPerRow[wid] = {
+                                        queue_no: qno,
+                                        date_created: date_created,
+                                        tsymbol: tsymbol
+                                    };
+                                }
+                            }
+                        } else {
+                            row.hide();
                         }
-                    }
+                        sortRowsByDateCreated();
+                    },
+                    error: function() {}
                 });
             }, 2000);
         });
-        // var renderTranss = setInterval(function() {
-        //     location.reload()
-        // }, 60000);
-        //get trans sound
-        $(document).ready(function() {
 
-            $('.transaction-x').each(function() {
-                var card = $(this);
-                var tid = card.data('tid');
-
-                var previousResponse = {
-                    status: '',
-                    data: {
-                        queue_no: '',
-                        date_created: '',
-                        recall: ''
-                    }
-                };
-
-                var renderServe = setInterval(function() {
-                    $.ajax({
-                        url: 'admin/ajax.php?action=get_queue_sound',
-                        method: "POST",
-                        data: {
-                            id: tid
-                        },
-                        success: function(resp) {
-                            try {
-                                parsedResp = JSON.parse(resp);
-                            } catch (error) {
-                                return;
-                            }
-                            resp = JSON.parse(resp);
-                            if (resp.status == 1) {
-                                if (
-                                    (resp.data.queue_no !== previousResponse.data.queue_no &&
-                                        resp.data.date_created !== previousResponse.data.date_created) || resp.data.recall !== previousResponse.data.recall
-                                ) {
-                                    let start = 'البطاقة رقم ';
-                                    let symbol = resp.data.tsymbol;
-                                    let num = resp.data.queue_no;
-                                    let to = ' إلى ';
-                                    let wnum = resp.data.wname;
-                                    let str = start + symbol + ' ' + num + to + wnum;
-                                    fetch('tts/tts.php', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/x-www-form-urlencoded'
-                                            },
-                                            body: 'text=' + encodeURIComponent(str)
-                                        })
-
-                                        .catch(error => {
-                                            console.error('AJAX request failed:', error);
-                                        });
-
-                                }
-
-                                previousResponse = resp;
-                            }
-                        }
-                    });
-                }, 2000);
+        function sortRowsByDateCreated() {
+            var tbody = $('#queue-tbody');
+            var rowsArr = tbody.find('tr:visible').get();
+            rowsArr.sort(function(a, b) {
+                var ad = $(a).data('date_created') || '';
+                var bd = $(b).data('date_created') || '';
+                if (!ad && !bd) return 0;
+                if (!ad) return 1;
+                if (!bd) return -1;
+                return new Date(ad) - new Date(bd);
             });
+            $.each(rowsArr, function(idx, rowEl) {
+                tbody.append(rowEl);
+            });
+        }
 
-        });
-    });
-</script>
+        setInterval(function() {
+            var visible = $('#queue-tbody').find('tr:visible').length;
+            if (visible === 0) {
+                if ($('#no-data-row').length === 0) {
+                    $('#queue-tbody').append('<tr id="no-data-row"><td colspan="4" style="padding:30px;font-size:20px;color:#666;">لا توجد أدوار حالياً</td></tr>');
+                }
+            } else {
+                $('#no-data-row').remove();
+            }
+        }, 1500);
+    </script>
+</body>
+
+</html>
