@@ -294,26 +294,29 @@ $summary = $summary_stmt->get_result()->fetch_assoc();
             <div class="date-group">
                 <input type="date" id="end_date" name="end_date" value="<?php echo $end_date; ?>" required>
             </div>
-            <button type="submit" class="btn">📈 Update Charts</button>
+            <button type="submit" class="btn">📈 <?= tr('Update_Charts') ?></button>
+            <button onclick="downloadExcel()" class="btn btn-success">
+                <i class="fas fa-file-excel"></i> <?= tr('Download_Excel') ?>
+            </button>
         </form>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
             <div class="stat-number"><?php echo number_format($summary['total_records']); ?></div>
-            <div class="stat-label">Total Records</div>
+            <div class="stat-label"><?= tr('total_records') ?></div>
         </div>
         <div class="stat-card">
             <div class="stat-number"><?php echo number_format($summary['total_staff']); ?></div>
-            <div class="stat-label">Active Staff</div>
+            <div class="stat-label"><?= tr('active_staff') ?></div>
         </div>
         <div class="stat-card">
             <div class="stat-number"><?php echo number_format($summary['total_days']); ?></div>
-            <div class="stat-label">Active Days</div>
+            <div class="stat-label"><?= tr('active_days') ?></div>
         </div>
         <div class="stat-card">
             <div class="stat-number"><?php echo $summary['total_records'] > 0 ? number_format($summary['total_records'] / max($summary['total_days'], 1), 1) : '0'; ?></div>
-            <div class="stat-label">Avg Daily</div>
+            <div class="stat-label"><?= tr('avg_daily') ?></div>
         </div>
     </div>
 
@@ -325,7 +328,7 @@ $summary = $summary_stmt->get_result()->fetch_assoc();
             </div>
         <?php else: ?>
             <div class="chart-section">
-                <h2 class="chart-title">Daily Processing Activity</h2>
+                <h2 class="chart-title"><?= tr('daily_processing_activity') ?></h2>
                 <div class="chart-wrapper">
                     <div class="chart-container">
                         <canvas id="dailyChart"></canvas>
@@ -334,7 +337,7 @@ $summary = $summary_stmt->get_result()->fetch_assoc();
             </div>
 
             <div class="chart-section">
-                <h2 class="chart-title">Staff Performance Overview</h2>
+                <h2 class="chart-title"><?= tr('staff_performance_overview') ?></h2>
                 <div class="chart-wrapper">
                     <div class="chart-container">
                         <canvas id="staffChart"></canvas>
@@ -343,14 +346,14 @@ $summary = $summary_stmt->get_result()->fetch_assoc();
             </div>
 
             <div class="chart-section">
-                <h2 class="chart-title">Staff Performance Details</h2>
+                <h2 class="chart-title"><?= tr('staff_performance_details') ?></h2>
                 <table class="staff-table">
                     <thead>
                         <tr>
-                            <th>Staff Name</th>
-                            <th>Total Processed</th>
-                            <th>First Activity</th>
-                            <th>Last Activity</th>
+                            <th><?= tr('staff_name') ?></th>
+                            <th><?= tr('total_processed') ?></th>
+                            <th><?= tr('first_activity') ?></th>
+                            <th><?= tr('last_activity') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -370,6 +373,58 @@ $summary = $summary_stmt->get_result()->fetch_assoc();
 </div>
 
 <script>
+    function downloadExcel() {
+        // Get the button element
+        const btn = event.target;
+        const originalText = btn.innerHTML;
+
+        // Show loading state
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+        btn.disabled = true;
+
+        // Get date range values
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+
+        // Validate dates
+        if (!startDate || !endDate) {
+            alert('الرجاء اختيار التواريخ أولاً');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+
+        // Create form to submit
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'download_queue_stats.php';
+        form.style.display = 'none';
+
+        // Add start_date
+        const startInput = document.createElement('input');
+        startInput.type = 'hidden';
+        startInput.name = 'start_date';
+        startInput.value = startDate;
+        form.appendChild(startInput);
+
+        // Add end_date
+        const endInput = document.createElement('input');
+        endInput.type = 'hidden';
+        endInput.name = 'end_date';
+        endInput.value = endDate;
+        form.appendChild(endInput);
+
+        // Submit form
+        document.body.appendChild(form);
+        form.submit();
+
+        // Reset button after 2 seconds
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            document.body.removeChild(form);
+        }, 2000);
+    }
     // Daily Chart Data
     const dailyData = <?php echo json_encode($daily_data); ?>;
     const staffData = <?php echo json_encode($staff_data); ?>;

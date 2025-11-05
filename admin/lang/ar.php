@@ -60,7 +60,6 @@ $ar_words = [
     'ticketNo' => 'رقم التذكرة',
     'statue' => 'الحالة',
     'time' => 'الوقت',
-    'waiting' => 'في الإنتظار',
     'waitForExamination' => 'في إنتظار الكشف',
     'referrals' => 'الإحالات',
     'addCompanyName' => 'إضافة إسم المؤسسة',
@@ -84,16 +83,24 @@ $ar_words = [
     'addUser' => 'إضافة مستخدم',
     'permissions' => 'الأذونات',
     'addEdit' => 'إضافة/تعديل',
-    'permissions' => 'الأذونات',
     'statistics' => 'الإحصائيات',
     'priority' => 'إعطائه الأولوية',
     'symbol' => 'الرمز',
     'custom_call' => 'نداء مخصص',
-    'call' => 'نداء',
-    'recall' => 'إعادةالنداء',
     'enter_card' => 'أدخل رقم البطاقة',
     'waitingTime' => "وقت الإنتظار",
-
+    'active_staff' => 'الموظفون النشطون',
+    'avg_daily' => 'المتوسط اليومي',
+    'daily_processing_activity' => 'نشاط المعالجة اليومي',
+    'staff_performance_overview' => 'نظرة عامة على أداء الموظفين',
+    'staff_performance_details' => 'تفاصيل أداء الموظفين',
+    'staff_name' => 'اسم الموظف',
+    'total_processed' => 'إجمالي المعالج',
+    'Maintenance' => 'صيانة',
+    'Backup' => 'نسخ إحتياطي',
+    'Export_SQL_database' => 'تصدير قاعدة بيانات SQL',
+    'waiting_counter' => 'عداد الإنتظار',
+    'Reset_Counter' => 'تصفير الأرقام',
     // Page titles and headers
     'user_statistics' => 'إحصائيات المستخدم',
     'user' => 'مستخدم',
@@ -113,6 +120,8 @@ $ar_words = [
     'start_date' => 'تاريخ البداية',
     'end_date' => 'تاريخ النهاية',
     'update_stats' => 'تحديث الإحصائيات',
+    'Update_Charts' => 'تحديث الرسوم البيانية',
+    'Download_Excel' => 'تحميل الاكسل',
 
     // Performance indicators
     'activity_rate' => 'معدل النشاط',
@@ -143,23 +152,21 @@ $ar_words = [
     'select_type' => 'إختر النوع',
     'period' => 'فترة الانتظار لزر التالي بالثواني',
 
-    'numberFrom'=>'الرقم من',
-    'numberTo'=>'الرقم الي',
+    'numberFrom' => 'الرقم من',
+    'numberTo' => 'الرقم الي',
 
-    'عيادة الفرز'=>'عيادة الفرز',
-    'Sorting clinic'=>'عيادة الفرز',
-    'عيادة الطبيب'=>'عيادة الطبيب',
-    'Doctor clinic'=>'عيادة الطبيب',
-    'Note section'=>'قسم الملاحظة',
-    'قسم الملاحظة'=>'قسم الملاحظة',
+    'عيادة الفرز' => 'عيادة الفرز',
+    'Sorting clinic' => 'عيادة الفرز',
+    'عيادة الطبيب' => 'عيادة الطبيب',
+    'Doctor clinic' => 'عيادة الطبيب',
+    'Note section' => 'قسم الملاحظة',
+    'قسم الملاحظة' => 'قسم الملاحظة',
 
-    'Sorting'=>'فرز',
-    'فرز'=>'فرز',
-    'Doctor'=>'طبيب',
-    'طبيب'=>'طبيب',
-    'ملاحظة'=>'ملاحظة',
-    'Note'=>'ملاحظة'
+    'Sorting' => 'فرز',
+    'فرز' => 'فرز',
+    'Doctor' => 'طبيب',
+    'طبيب' => 'طبيب',
+    'ملاحظة' => 'ملاحظة',
+    'Note' => 'ملاحظة'
 
 ];
-
-?>
