@@ -213,7 +213,7 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                             </a>
                             <h6 class="collapse-header"><?= tr('waiting_counter') ?>:</h6>
                             <a href="#" class="collapse-item" id="exportLink" onclick="(event)">
-                                <i class="fas fa-database"></i> <?= tr('Reset_Counter') ?>
+                                </i> <?= tr('Reset_Counter') ?>
                             </a>
                         </div>
                     </div>
