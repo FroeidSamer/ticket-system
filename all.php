@@ -294,11 +294,13 @@ include "admin/db_connect.php";
             k++;
             var ext = src.split('.').pop().toLowerCase();
             var file;
+
             if (ext === 'webm' || ext === 'mp4') {
                 file = $("<video id='slide' src='admin/assets/uploads/" + src + "' autoplay muted playsinline onended='render_slides(" + k + ")'></video>");
             } else {
                 file = $("<img id='slide' src='admin/assets/uploads/" + src + "' onload='slideInterval(" + k + ")' />");
             }
+
             if ($('#slide').length > 0) {
                 $('#slide').css({
                     "opacity": 0
@@ -309,7 +311,6 @@ include "admin/db_connect.php";
                     $('#slide').css({
                         "opacity": 1
                     });
-                    if (ext === 'webm' || ext === 'mp4') $('video').trigger('play');
                 }, 400);
             } else {
                 $('.slideShow').append(file);
@@ -324,21 +325,30 @@ include "admin/db_connect.php";
                 render_slides(i);
             }, 5000);
         }
+
         if (scount > 0) $(function() {
             render_slides(0);
         });
 
+
+        // ========================= START QUEUE LOGIC HERE =========================
+
         var previousPerRow = {};
         var rows = $('.queue-row');
+
         rows.each(function() {
             var row = $(this);
             var wid = row.data('wid');
             var tids = row.data('tids');
+
             previousPerRow[wid] = {
                 queue_no: '',
-                date_created: '',
-                tsymbol: ''
+                date_created: 0,
+                tsymbol: '',
+                clinic: '',
+                wname: ''
             };
+
             setInterval(function() {
                 $.ajax({
                     url: 'admin/ajax.php?action=get_queue',
@@ -349,83 +359,80 @@ include "admin/db_connect.php";
                     },
                     success: function(resp) {
                         try {
-                            var r = typeof resp === 'object' ? resp : JSON.parse(resp);
+                            var r = (typeof resp === 'object') ? resp : JSON.parse(resp);
                         } catch (e) {
                             return;
                         }
+
                         if (r.status == 1 && r.data) {
+
                             var tsymbol = r.data.tsymbol || '';
                             var qno = r.data.queue_no || '';
                             var clinic = r.data.clinic_name || r.data.tname || '';
                             var wname = r.data.wname || '';
-                            var date_created = r.data.date_created || r.data.created_timestamp || '';
+                            var date_created = r.data.date_created || '';
 
-                            row.find('.td-clinic').text(clinic ? clinic : row.find('.td-window').text()); // العمود الأول
-                            row.find('.td-queue').text(qno ? (tsymbol + ' - ' + qno) : '-'); // العمود الثاني
-                            row.find('.td-symbol').text(tsymbol ? tsymbol : '-'); // العمود الثالث (النوع)
-                            row.find('.td-window').text(wname ? wname : row.find('.td-window').text()); // الشباك
+                            // ✅ تحويل التاريخ لرقم قابل للترتيب
+                            var timestamp = Date.parse(date_created) || 0;
 
-                            if (qno && qno !== '0') {
-                                row.show();
-                            } else {
-                                row.hide();
-                            }
+                            previousPerRow[wid] = {
+                                tsymbol: tsymbol,
+                                queue_no: qno,
+                                clinic: clinic,
+                                wname: wname,
+                                date_created: timestamp
+                            };
+                        }
 
-                            row.data('date_created', date_created);
+                        var saved = previousPerRow[wid];
 
-                            var prev = previousPerRow[wid];
-                            if (prev.queue_no !== qno || prev.tsymbol !== tsymbol || prev.date_created !== date_created) {
-                                if (qno) {
-                                    var text = 'البطاقة رقم ' + tsymbol + ' ' + qno + '، برجاء التوجه إلى ' + clinic;
-                                    fetch('tts/tts.php', {
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/x-www-form-urlencoded'
-                                        },
-                                        body: 'text=' + encodeURIComponent(text)
-                                    }).catch(function(e) {
-                                        console.error(e);
-                                    });
-                                    previousPerRow[wid] = {
-                                        queue_no: qno,
-                                        date_created: date_created,
-                                        tsymbol: tsymbol
-                                    };
-                                }
-                            }
+                        //  لو فيه بيانات يظهر الصف
+                        if (saved.queue_no && saved.queue_no !== '0') {
+
+                            row.find('.td-clinic').text(saved.clinic || row.find('.td-window').text());
+                            row.find('.td-queue').text(saved.tsymbol + ' - ' + saved.queue_no);
+                            row.find('.td-symbol').text(saved.tsymbol || '-');
+                            row.find('.td-window').text(saved.wname || row.find('.td-window').text());
+
+                            //  نحفظ التاريخ في الـ DOM كرقم
+                            row.data('date_created', parseInt(saved.date_created));
+
+                            row.show();
                         } else {
                             row.hide();
                         }
+
+                        //  ترتيب كل الصفوف بعد التحديث
                         sortRowsByDateCreated();
-                    },
-                    error: function() {}
+                    }
                 });
             }, 2000);
         });
 
+
+        //  ترتيب الأحدث فوق مع الحفاظ على كل الصفوف
         function sortRowsByDateCreated() {
             var tbody = $('#queue-tbody');
+            var rows = tbody.find('tr').get(); // مهم: بدون :visible
 
-            // ناخد الصفوف الظاهرة فقط عشان المخفية مالهاش تاريخ مفيد
-            var rowsArr = tbody.find('tr:visible').get();
-
-            rowsArr.sort(function(a, b) {
-                var ad = $(a).data('date_created') || '';
-                var bd = $(b).data('date_created') || '';
-
-                if (!ad && !bd) return 0;
-                if (!ad) return 1;
-                if (!bd) return -1;
-
-                // عكس الترتيب: الأحدث فوق
-                return new Date(bd) - new Date(ad);
+            rows.sort(function(a, b) {
+                var ad = $(a).data('date_created') || 0;
+                var bd = $(b).data('date_created') || 0;
+                return bd - ad; // الأحدث فوق
             });
 
-            $.each(rowsArr, function(idx, rowEl) {
-                tbody.append(rowEl);
+            $.each(rows, function(i, row) {
+                tbody.append(row);
+                //  لو الصف مش فيه رقم دور → نخفيه بعد وضعه في مكانه الصحيح
+                if ($(row).find('.td-queue').text().trim() === '-' || $(row).find('.td-queue').text().trim() === '') {
+                    $(row).hide();
+                } else {
+                    $(row).show();
+                }
             });
         }
     </script>
+
 </body>
 
 </html>
