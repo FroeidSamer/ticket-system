@@ -9,6 +9,81 @@ class Queue
         $this->db = $db;
     }
 
+    /**
+     * Generate queue number based on transaction's numberFrom and numberTo range
+     * Resets daily and cycles when reaching numberTo
+     */
+    private function generate_queue_number($transaction_id)
+    {
+        try {
+            $today = date("Y-m-d");
+
+            // DEBUG: Log the transaction_id being processed
+            error_log("Generating queue for transaction_id: " . $transaction_id);
+
+            // Get numberFrom and numberTo for this transaction
+            $trans_stmt = $this->db->prepare("SELECT numberFrom, numberTo, name FROM transactions WHERE id = ?");
+            $trans_stmt->bind_param("i", $transaction_id);
+            $trans_stmt->execute();
+            $trans_result = $trans_stmt->get_result();
+            $transaction_data = $trans_result->fetch_assoc();
+            $trans_stmt->close();
+
+            if (!$transaction_data) {
+                error_log("ERROR: Transaction ID {$transaction_id} not found!");
+                throw new Exception("Transaction not found");
+            }
+
+            $numberFrom = (int)$transaction_data['numberFrom'];
+            $numberTo = (int)$transaction_data['numberTo'];
+
+            // DEBUG: Log the range
+            error_log("Transaction: {$transaction_data['name']}, Range: {$numberFrom} to {$numberTo}");
+
+            // Validate range
+            if ($numberTo < $numberFrom) {
+                error_log("ERROR: Invalid range for transaction {$transaction_id}");
+                throw new Exception("Invalid number range");
+            }
+
+            // Get the last queue number for this transaction TODAY
+            $stmt = $this->db->prepare(
+                "SELECT MAX(queue_no) as last_queue 
+             FROM queue_list 
+             WHERE DATE(created_timestamp) = ? 
+             AND transaction_id = ? 
+             FOR UPDATE"
+            );
+            $stmt->bind_param("si", $today, $transaction_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $row = $result->fetch_assoc();
+            $last_queue = $row['last_queue'];
+            $stmt->close();
+
+            // DEBUG: Log last queue
+            error_log("Last queue for transaction {$transaction_id}: " . ($last_queue ?? 'NULL'));
+
+            // Generate new queue number
+            if ($last_queue === null || $last_queue < $numberFrom || $last_queue >= $numberTo) {
+                $queue_no = $numberFrom;
+                error_log("Starting fresh from numberFrom: {$queue_no}");
+            } else {
+                if ($last_queue >= $numberTo) {
+                    $queue_no = $numberFrom;
+                    error_log("Reached limit, resetting to: {$queue_no}");
+                } else {
+                    $queue_no = $last_queue + 1;
+                    error_log("Incrementing to: {$queue_no}");
+                }
+            }
+
+            return $queue_no;
+        } catch (Exception $e) {
+            error_log("Queue number generation error: " . $e->getMessage());
+            return false;
+        }
+    }
 
     public function save_queue()
     {
@@ -17,42 +92,26 @@ class Queue
         $this->db->begin_transaction();
 
         try {
-            $today = date("Y-m-d");
-            
-            $stmt = $this->db->prepare("SELECT MAX(queue_no) as last_queue FROM queue_list WHERE DATE(created_timestamp) = ? FOR UPDATE");
-            $stmt->bind_param("s", $today);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $last_queue = $result->fetch_assoc()['last_queue'];
-            
-            $stmt->close();
+            // Generate queue number based on transaction range
+            $queue_no = $this->generate_queue_number($transaction_id);
 
-            if ($last_queue === null) {
-                $queue_no = 1001;
-            } else {
-                $queue_no = $last_queue + 1;
+            if ($queue_no === false) {
+                throw new Exception("Failed to generate queue number");
             }
 
             // If client provided a selection (A/B), try to store it in a dedicated `selection` column.
-            // Accept only 'A' or 'B' as valid selection values. Anything else will be ignored.
-            $selectionVal = (isset($selection) && in_array($selection, array('A','B'))) ? $selection : null;
+            $selectionVal = (isset($selection) && in_array($selection, array('A', 'B'))) ? $selection : null;
 
-            // Check if `selection` column exists; if not, attempt to create it.
+            // Check if `selection` column exists
             $selCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'selection'");
             if (!($selCol && $selCol->num_rows > 0)) {
-                // Try to add the column (if permissions allow). Not critical if it fails.
                 @$this->db->query("ALTER TABLE queue_list ADD COLUMN selection VARCHAR(1) NULL DEFAULT NULL");
-                // re-check
                 $selCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'selection'");
             }
 
-            // If selection provided, user requested storing A/B into `status` column as text (e.g. '-A-' or '-B-').
-            // NOTE: Changing `status` contents to text may break other parts of the app that expect numeric status (0/1).
             if ($selectionVal !== null && $selCol && $selCol->num_rows > 0) {
-                // attempt to store both in `selection` column and also put marker into `status` as requested
                 $statusMarker = ($selectionVal === 'A') ? '-A-' : '-B-';
 
-                // Ensure status column exists; if it's numeric MySQL will coerce, but try to modify to varchar to allow text
                 $statusCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'status'");
                 $shouldModify = false;
                 if ($statusCol && $statusCol->num_rows > 0) {
@@ -62,7 +121,6 @@ class Queue
                     }
                 }
                 if ($shouldModify) {
-                    // try to alter to varchar(10); suppress warnings
                     @$this->db->query("ALTER TABLE queue_list MODIFY status VARCHAR(10) DEFAULT NULL");
                 }
 
@@ -70,14 +128,10 @@ class Queue
                     $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no, selection, status) VALUES (?, ?, ?, ?)");
                     $insert_stmt->bind_param("iiss", $transaction_id, $queue_no, $selectionVal, $statusMarker);
                 } else {
-                    // if no selection column, still insert status marker
                     $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no, status) VALUES (?, ?, ?)");
                     $insert_stmt->bind_param("iss", $transaction_id, $queue_no, $statusMarker);
                 }
             } else {
-                // No selection provided. Attempt to insert an empty status string when the
-                // `status` column supports textual values. If `status` is numeric (int/tinyint),
-                // fall back to inserting without specifying status (preserve existing behavior).
                 $statusCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'status'");
                 $useEmptyStatus = false;
                 if ($statusCol && $statusCol->num_rows > 0) {
@@ -88,13 +142,12 @@ class Queue
                 }
 
                 if ($useEmptyStatus) {
-                    // insert explicit empty string into status
                     $emptyStatus = '';
                     $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no, status) VALUES (?, ?, ?)");
                     $insert_stmt->bind_param("iss", $transaction_id, $queue_no, $emptyStatus);
                 } else {
                     $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no) VALUES (?, ?)");
-                    $insert_stmt->bind_param("is", $transaction_id, $queue_no);
+                    $insert_stmt->bind_param("ii", $transaction_id, $queue_no);
                 }
             }
 
@@ -113,9 +166,11 @@ class Queue
             }
         } catch (Exception $e) {
             $this->db->rollback();
+            error_log("Save queue error: " . $e->getMessage());
             return false;
         }
     }
+
     public function get_queue()
     {
         extract($_POST);
@@ -264,10 +319,8 @@ class Queue
         $login_staff_id = (int) $_SESSION['login_id'];
         $today = date('Y-m-d');
 
-        // Get previous_ticket_id from POST (sent from queueNow())
         $previous_ticket_id = isset($_POST['previous_ticket_id']) ? (int)$_POST['previous_ticket_id'] : null;
 
-        // Get transaction_ids allowed for this window
         $transactionWindow = $this->db->query("SELECT * FROM transaction_windows WHERE id = $login_window_id")->fetch_array();
         $tids = $transactionWindow['transaction_ids'] ?: $transactionWindow['transaction_id'];
         $tids_array = array_filter(array_map('intval', explode(',', $tids)));
@@ -278,7 +331,7 @@ class Queue
 
         $in_clause = implode(',', $tids_array);
 
-        // 1. Priority handling
+        // Priority handling
         $priorityQuery = $this->db->query("SELECT * FROM transactions WHERE priority = 'on' LIMIT 1");
         if ($priorityQuery->num_rows > 0) {
             $priorityTransaction = $priorityQuery->fetch_assoc();
@@ -312,7 +365,7 @@ class Queue
             }
         }
 
-        // 2. Fallback for allowed transaction_ids
+        // Fallback for allowed transaction_ids
         $ticketQuery = $this->db->query("
         SELECT * FROM queue_list 
         WHERE DATE(created_timestamp) = '$today' 
@@ -537,18 +590,15 @@ class Queue
 
     public function get_staff_info()
     {
-        $login_window_id = (int) $_SESSION['login_window_id']; // Sanitize input
+        $login_window_id = (int) $_SESSION['login_window_id'];
         $data = [];
 
-        // Get the transaction window info
         $transactionWindow = $this->db->query("SELECT * FROM transaction_windows WHERE id = $login_window_id")->fetch_array();
 
-        // Use multiple transaction_ids if available
         $tids = $transactionWindow['transaction_ids'] ?: $transactionWindow['transaction_id'];
         $tids_array = array_filter(array_map('intval', explode(',', $tids)));
         $in_clause = implode(',', $tids_array);
 
-        // Last 4 completed for this window
         $query = $this->db->query("
 			SELECT q.*, t.name AS wname 
 			FROM queue_list q 
@@ -577,14 +627,12 @@ class Queue
                     'queue_no'           => $row['queue_no'],
                     'type_id'            => $type,
                     'created_timestamp'  => $row['created_timestamp'],
-                    // include any stored selection or raw status for display on staff UI
                     'selection'          => isset($row['selection']) ? $row['selection'] : null,
                     'status_raw'         => isset($row['status']) ? $row['status'] : null
                 ];
             }
         }
 
-        // Count waiting where transaction_id is in $tids_array
         $waiting = 0;
         if (!empty($tids_array)) {
             $waitingQuery = $this->db->query("
@@ -611,25 +659,23 @@ class Queue
     {
         $transactionWindow = $this->db->query("SELECT * FROM transaction_windows WHERE id = " . $_SESSION['login_window_id'])->fetch_array();
 
-        // Get transaction_ids (can be NULL or comma-separated)
         $tids = $transactionWindow['transaction_ids'];
         if (!$tids) {
             $tids = $transactionWindow['transaction_id'];
         }
 
-        // Sanitize and convert to array
         $tids_array = array_filter(array_map('intval', explode(',', $tids)));
 
         if (empty($tids_array)) {
             return json_encode(['status' => 0, 'data' => [], 'message' => 'No valid transaction IDs.']);
         }
 
-        // Build IN clause
         $in_clause = implode(',', $tids_array);
 
         $data = [];
 
         $statusTypes = [];
+        $statusColors = [];
         $typesQuery = $this->db->query("SELECT id,type, color FROM status");
         if ($typesQuery->num_rows > 0) {
             while ($typeRow = $typesQuery->fetch_assoc()) {
@@ -638,7 +684,6 @@ class Queue
             }
         }
 
-        // Query queue_list only for relevant transaction_ids
         $query = $this->db->query("SELECT q.*, t.symbol as tsymbol 
         FROM queue_list q
         INNER JOIN transactions t ON t.id = q.transaction_id
@@ -670,7 +715,6 @@ class Queue
                     'type_color' => $statusColors[$row['type_id']] ?? "#ffffff",
                     'created_timestamp' => $row['created_timestamp'],
                     'waiting_time' => $this->secondsToArabicText(time() - strtotime($row['created_timestamp'])),
-                    // expose selection and raw status so UI can show -A- / -B- markers when present
                     'selection' => isset($row['selection']) ? $row['selection'] : null,
                     'status_raw' => isset($row['status']) ? $row['status'] : null
                 );
@@ -723,7 +767,7 @@ class Queue
     {
         $tid = $this->db->query("SELECT * FROM transaction_windows where id =" . $_SESSION['login_window_id'])->fetch_array()['transaction_id'];
         $data = [];
-        //last 4
+
         $query = $this->db->query("SELECT * FROM queue_list where date(created_timestamp) = '" . date('Y-m-d') . "' and transaction_id = '" . $tid . "' and status = 0
 		ORDER BY
   CASE
@@ -754,7 +798,7 @@ class Queue
                 }
             }
         }
-        //return data
+
         return json_encode(array('status' => 1,  "data" => $data));
     }
 
@@ -810,6 +854,7 @@ class Queue
             return json_encode(array('status' => 0));
         }
     }
+
     public function recordWaitingTime($queue_id, $transaction_id, $status_id = null)
     {
         if ($queue_id != null  && $transaction_id != null) {

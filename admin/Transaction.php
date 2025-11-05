@@ -12,7 +12,7 @@ class Transaction
     public function save_transaction()
     {
         extract($_POST);
-    
+
         $data = " name = ? ";
         $params = [$name];
         $types = "s";
@@ -30,7 +30,7 @@ class Transaction
         $chk_stmt->bind_param("s" . $ctypes, $name, ...$cparams);
         $chk_stmt->execute();
         $chk_result = $chk_stmt->get_result();
-    
+
         if ($chk_result->num_rows > 0) {
             return 2;
             exit;
@@ -43,7 +43,7 @@ class Transaction
         $data .= ", priority = ? ";
         $params[] = isset($priority) ? 1 : 2;
         $types .= "i";
-        
+
         if (isset($symbol)) {
             $data .= ", symbol = ? ";
             $params[] = $symbol;
@@ -55,24 +55,20 @@ class Transaction
             $types .= "s";
         }
 
-        if (isset($numberFrom) && $numberFrom>=0) {
+        if (isset($numberFrom) && $numberFrom >= 0) {
             $data .= ", numberFrom = ? ";
             $params[] = $numberFrom;
             $types .= "i";
-        }
-        else
-        {
+        } else {
             return 3;
             exit;
         }
 
-        if (isset($numberTo) && $numberTo>=0 && $numberTo>=$numberFrom) {
+        if (isset($numberTo) && $numberTo >= 0 && $numberTo >= $numberFrom) {
             $data .= ", numberTo = ? ";
             $params[] = $numberTo;
             $types .= "i";
-        }
-        else
-        {
+        } else {
             return 4;
             exit;
         }
