@@ -151,7 +151,7 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                 <!-- Nav Item - Pages Collapse Menu -->
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
-                        <i class="fas fa-fw fa-cog"></i>
+                        <i class="fas fa-fw fa-folder"></i>
                         <span><?= tr('sections') ?></span>
                     </a>
                     <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
@@ -168,7 +168,7 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
 
                 <li class="nav-item">
                     <a class="nav-link" href="index.php?page=users">
-                        <i class="fas fa-fw fa-wrench"></i>
+                        <i class="fas fa-fw fa-folder"></i>
                         <span><?= tr('users') ?></span></a>
                 </li>
                 <!-- Divider -->
@@ -182,7 +182,7 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                 <!-- Nav Item - Pages Collapse Menu -->
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
-                        <i class="fas fa-fw fa-folder"></i>
+                        <i class="fas fa-fw fa-cog"></i>
                         <span><?= tr('settings') ?></span>
                     </a>
                     <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
@@ -202,7 +202,7 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                 <li class="nav-item">
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBackup"
                         aria-expanded="false" aria-controls="collapseBackup">
-                        <i class="fas fa-fw fa-database"></i>
+                        <i class="fas fa-fw fa-wrench"></i>
                         <span><?= tr('Maintenance') ?></span>
                     </a>
                     <div id="collapseBackup" class="collapse" aria-labelledby="headingBackup" data-parent="#accordionSidebar">
