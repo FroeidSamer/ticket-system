@@ -360,7 +360,7 @@ include "admin/db_connect.php";
                             var wname = r.data.wname || '';
                             var date_created = r.data.date_created || r.data.created_timestamp || '';
 
-                            row.find('.td-clinic').text(clinic ? clinic : '-'); // العمود الأول
+                            row.find('.td-clinic').text(clinic ? clinic : row.find('.td-window').text()); // العمود الأول
                             row.find('.td-queue').text(qno ? (tsymbol + ' - ' + qno) : '-'); // العمود الثاني
                             row.find('.td-symbol').text(tsymbol ? tsymbol : '-'); // العمود الثالث (النوع)
                             row.find('.td-window').text(wname ? wname : row.find('.td-window').text()); // الشباك
@@ -405,30 +405,26 @@ include "admin/db_connect.php";
 
         function sortRowsByDateCreated() {
             var tbody = $('#queue-tbody');
+
+            // ناخد الصفوف الظاهرة فقط عشان المخفية مالهاش تاريخ مفيد
             var rowsArr = tbody.find('tr:visible').get();
+
             rowsArr.sort(function(a, b) {
                 var ad = $(a).data('date_created') || '';
                 var bd = $(b).data('date_created') || '';
+
                 if (!ad && !bd) return 0;
                 if (!ad) return 1;
                 if (!bd) return -1;
-                return new Date(ad) - new Date(bd);
+
+                // عكس الترتيب: الأحدث فوق
+                return new Date(bd) - new Date(ad);
             });
+
             $.each(rowsArr, function(idx, rowEl) {
                 tbody.append(rowEl);
             });
         }
-
-        setInterval(function() {
-            var visible = $('#queue-tbody').find('tr:visible').length;
-            if (visible === 0) {
-                if ($('#no-data-row').length === 0) {
-                    $('#queue-tbody').append('<tr id="no-data-row"><td colspan="4" style="padding:30px;font-size:20px;color:#666;">لا توجد أدوار حالياً</td></tr>');
-                }
-            } else {
-                $('#no-data-row').remove();
-            }
-        }, 1500);
     </script>
 </body>
 
