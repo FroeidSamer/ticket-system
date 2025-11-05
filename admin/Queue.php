@@ -33,8 +33,70 @@ class Queue
                 $queue_no = $last_queue + 1;
             }
 
-            $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no) VALUES (?, ?)");
-            $insert_stmt->bind_param("is", $transaction_id, $queue_no);
+            // If client provided a selection (A/B), try to store it in a dedicated `selection` column.
+            // Accept only 'A' or 'B' as valid selection values. Anything else will be ignored.
+            $selectionVal = (isset($selection) && in_array($selection, array('A','B'))) ? $selection : null;
+
+            // Check if `selection` column exists; if not, attempt to create it.
+            $selCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'selection'");
+            if (!($selCol && $selCol->num_rows > 0)) {
+                // Try to add the column (if permissions allow). Not critical if it fails.
+                @$this->db->query("ALTER TABLE queue_list ADD COLUMN selection VARCHAR(1) NULL DEFAULT NULL");
+                // re-check
+                $selCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'selection'");
+            }
+
+            // If selection provided, user requested storing A/B into `status` column as text (e.g. '-A-' or '-B-').
+            // NOTE: Changing `status` contents to text may break other parts of the app that expect numeric status (0/1).
+            if ($selectionVal !== null && $selCol && $selCol->num_rows > 0) {
+                // attempt to store both in `selection` column and also put marker into `status` as requested
+                $statusMarker = ($selectionVal === 'A') ? '-A-' : '-B-';
+
+                // Ensure status column exists; if it's numeric MySQL will coerce, but try to modify to varchar to allow text
+                $statusCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'status'");
+                $shouldModify = false;
+                if ($statusCol && $statusCol->num_rows > 0) {
+                    $stype = $statusCol->fetch_assoc()['Type'];
+                    if (stripos($stype, 'int') !== false || stripos($stype, 'tinyint') !== false) {
+                        $shouldModify = true;
+                    }
+                }
+                if ($shouldModify) {
+                    // try to alter to varchar(10); suppress warnings
+                    @$this->db->query("ALTER TABLE queue_list MODIFY status VARCHAR(10) DEFAULT NULL");
+                }
+
+                if ($selCol && $selCol->num_rows > 0) {
+                    $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no, selection, status) VALUES (?, ?, ?, ?)");
+                    $insert_stmt->bind_param("iiss", $transaction_id, $queue_no, $selectionVal, $statusMarker);
+                } else {
+                    // if no selection column, still insert status marker
+                    $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no, status) VALUES (?, ?, ?)");
+                    $insert_stmt->bind_param("iss", $transaction_id, $queue_no, $statusMarker);
+                }
+            } else {
+                // No selection provided. Attempt to insert an empty status string when the
+                // `status` column supports textual values. If `status` is numeric (int/tinyint),
+                // fall back to inserting without specifying status (preserve existing behavior).
+                $statusCol = $this->db->query("SHOW COLUMNS FROM queue_list LIKE 'status'");
+                $useEmptyStatus = false;
+                if ($statusCol && $statusCol->num_rows > 0) {
+                    $stype = $statusCol->fetch_assoc()['Type'];
+                    if (stripos($stype, 'int') === false && stripos($stype, 'tinyint') === false) {
+                        $useEmptyStatus = true;
+                    }
+                }
+
+                if ($useEmptyStatus) {
+                    // insert explicit empty string into status
+                    $emptyStatus = '';
+                    $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no, status) VALUES (?, ?, ?)");
+                    $insert_stmt->bind_param("iss", $transaction_id, $queue_no, $emptyStatus);
+                } else {
+                    $insert_stmt = $this->db->prepare("INSERT INTO queue_list (transaction_id, queue_no) VALUES (?, ?)");
+                    $insert_stmt->bind_param("is", $transaction_id, $queue_no);
+                }
+            }
 
             if ($insert_stmt->execute()) {
                 $queue_id = $this->db->insert_id;
@@ -514,7 +576,10 @@ class Queue
                     'window_id'          => $row['window_id'],
                     'queue_no'           => $row['queue_no'],
                     'type_id'            => $type,
-                    'created_timestamp'  => $row['created_timestamp']
+                    'created_timestamp'  => $row['created_timestamp'],
+                    // include any stored selection or raw status for display on staff UI
+                    'selection'          => isset($row['selection']) ? $row['selection'] : null,
+                    'status_raw'         => isset($row['status']) ? $row['status'] : null
                 ];
             }
         }
@@ -604,7 +669,10 @@ class Queue
                     'type' => $statusTypes[$row['type_id']] ?? null,
                     'type_color' => $statusColors[$row['type_id']] ?? "#ffffff",
                     'created_timestamp' => $row['created_timestamp'],
-                    'waiting_time' => $this->secondsToArabicText(time() - strtotime($row['created_timestamp']))
+                    'waiting_time' => $this->secondsToArabicText(time() - strtotime($row['created_timestamp'])),
+                    // expose selection and raw status so UI can show -A- / -B- markers when present
+                    'selection' => isset($row['selection']) ? $row['selection'] : null,
+                    'status_raw' => isset($row['status']) ? $row['status'] : null
                 );
             }
         }

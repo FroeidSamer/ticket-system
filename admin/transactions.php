@@ -122,15 +122,9 @@
                                 <input type="checkbox" class="chk_box" name="priority">
                                 <span class="slider round"></span>
                             </label>
-                            <span class="ml-2"><?= tr('priority') ?></span>
+                           <span class="ml-2"><?= tr('priority') ?></span>
                         </div>
-                        <div class="form-check form-switch mb-3">
-                            <label class="switch">
-                                <input type="checkbox" class="chk_box" name="show_ab_selection">
-                                <span class="slider round"></span>
-                            </label>
-                            <span class="ml-2">Show A/B Selection</span>
-                        </div>
+                     
                     </div>
 
                     <div class="card-footer">

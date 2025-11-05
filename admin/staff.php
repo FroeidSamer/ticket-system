@@ -505,9 +505,21 @@ if ($qry->num_rows > 0) {
                     const queueNoCell = document.createElement('td');
                     queueNoCell.textContent = queueNo;
 
-                    // Type ID cell - now with color styling
+                    // Type / status cell - show A/B marker if present, otherwise show status type
                     const typeIdCell = document.createElement('td');
-                    typeIdCell.textContent = typeId;
+                    // Determine display priority: explicit selection (A/B) -> raw status (e.g. '-A-') -> status type name
+                    let displayValue = '';
+                    if (info.selection) {
+                        // selection is stored as 'A' or 'B' in the selection column
+                        displayValue = '-' + info.selection + '-';
+                    } else if (info.status_raw && typeof info.status_raw === 'string' && info.status_raw.indexOf('-') === 0) {
+                        // status_raw may contain '-A-' or '-B-'
+                        displayValue = info.status_raw;
+                    } else {
+                        displayValue = typeId || '';
+                    }
+
+                    typeIdCell.textContent = displayValue;
                     if (typeColor) {
                         typeIdCell.style.backgroundColor = typeColor;
                         typeIdCell.style.color = getContrastColor(typeColor);
