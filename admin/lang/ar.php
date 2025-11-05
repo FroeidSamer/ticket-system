@@ -96,6 +96,11 @@ $ar_words = [
     'staff_performance_details' => 'تفاصيل أداء الموظفين',
     'staff_name' => 'اسم الموظف',
     'total_processed' => 'إجمالي المعالج',
+    'Maintenance' => 'صيانة',
+    'Backup' => 'نسخ إحتياطي',
+    'Export_SQL_database' => 'تصدير قاعدة بيانات SQL',
+    'waiting_counter' => 'عداد الإنتظار',
+    'Reset_Counter' => 'تصفير الأرقام',
     // Page titles and headers
     'user_statistics' => 'إحصائيات المستخدم',
     'user' => 'مستخدم',

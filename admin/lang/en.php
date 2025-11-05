@@ -97,6 +97,11 @@ $en_words = [
     'staff_performance_details' => 'Staff Performance Details',
     'staff_name' => 'Staff Name',
     'total_processed' => 'Total Processed',
+    'Maintenance' => 'Maintenance',
+    'Backup' => 'Backup',
+    'Export_SQL_database' => 'Export SQL database',
+    'waiting_counter' => 'Waiting counter',
+    'Reset_Counter' => 'Reset Counter',
     // Page titles and headers
     'user_statistics' => 'User Statistics',
     'user' => 'User',

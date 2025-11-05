@@ -203,17 +203,17 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBackup"
                         aria-expanded="false" aria-controls="collapseBackup">
                         <i class="fas fa-fw fa-database"></i>
-                        <span>الصيانة</span>
+                        <span><?= tr('Maintenance') ?></span>
                     </a>
                     <div id="collapseBackup" class="collapse" aria-labelledby="headingBackup" data-parent="#accordionSidebar">
                         <div class="bg-white py-2 collapse-inner rounded">
-                            <h6 class="collapse-header">نسخ احتياطي:</h6>
+                            <h6 class="collapse-header"><?= tr('Backup') ?>:</h6>
                             <a href="#" class="collapse-item" id="exportLink" onclick="exportDatabase(event)">
-                                <i class="fas fa-database"></i> تصدير قاعدة البيانات SQL
+                                <i class="fas fa-database"></i><?= tr('Export_SQL_database') ?>
                             </a>
-                            <h6 class="collapse-header">عداد الارقام:</h6>
+                            <h6 class="collapse-header"><?= tr('waiting_counter') ?>:</h6>
                             <a href="#" class="collapse-item" id="exportLink" onclick="(event)">
-                                <i class="fas fa-database"></i> تصفير العداد
+                                <i class="fas fa-database"></i> <?= tr('Reset_Counter') ?>
                             </a>
                         </div>
                     </div>
