@@ -175,29 +175,32 @@ class Queue
     {
         extract($_POST);
         $today = date('Y-m-d');
-        $stmt = $this->db->prepare("SELECT q.*, t.name as wname, ts.symbol as tsymbol 
-                                 FROM queue_list q 
-                                 INNER JOIN transaction_windows t ON t.id = q.window_id 
-                                 INNER JOIN transactions ts ON ts.id = q.transaction_id 
-                                 WHERE DATE(q.created_timestamp) = ? AND q.window_id = ? AND q.status = 1 
-                                 ORDER BY q.created_timestamp DESC LIMIT 1");
+        $stmt = $this->db->prepare("SELECT 
+                            q.*, 
+                            q.selection as queue_selection,
+                            t.name as wname, 
+                            ts.symbol as tsymbol,
+                            ts.name as tname,
+                            UNIX_TIMESTAMP(q.created_timestamp) as timestamp_unix
+                          FROM 
+                            queue_list q 
+                          INNER JOIN transaction_windows t ON t.id = q.window_id 
+                          INNER JOIN transactions ts ON ts.id = q.transaction_id 
+                          WHERE DATE(q.created_timestamp) = ? 
+                            AND q.window_id = ? 
+                            AND q.status = 1 
+                          ORDER BY q.created_timestamp DESC 
+                          LIMIT 1");
         $stmt->bind_param("si", $today, $wid);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
             $data = $result->fetch_assoc();
-            $type = '';
-            if ($data['type_id'] != null) {
-                $type_stmt = $this->db->prepare("SELECT type FROM status WHERE id = ?");
-                $type_stmt->bind_param("i", $data['type_id']);
-                $type_stmt->execute();
-                $type_result = $type_stmt->get_result();
-                if ($type_result->num_rows > 0) {
-                    $type = $type_result->fetch_assoc()['type'];
-                }
-            }
-            $data['symbol'] = $type;
+
+            // Get النوع from selection column in queue_list table
+            $data['display_type'] = $data['queue_selection'] ?? '-';
+
             return json_encode(array('status' => 1, "data" => $data));
         } else {
             return json_encode(array('status' => 0));
@@ -809,9 +812,9 @@ class Queue
         $window_id = $_SESSION['login_window_id'];
         $today = date('Y-m-d');
         $called_at = date('Y-m-d H:i:s');
-
-        $update_stmt = $this->db->prepare("UPDATE queue_list SET status = 1, window_id = ?, called_at = ? WHERE id = ? AND DATE(created_timestamp) = ? AND status = 0 ORDER BY id ASC LIMIT 1");
-        $update_stmt->bind_param("isis", $window_id, $called_at, $queueId, $today);
+        $this->db->query("UPDATE queue_list SET status = 2 WHERE window_id = {$window_id} AND status = 1");
+        $update_stmt = $this->db->prepare("UPDATE queue_list SET status = 1, window_id = ?, called_at = ?, created_timestamp = ? WHERE id = ? AND DATE(created_timestamp) = ? AND status = 0 ORDER BY id ASC LIMIT 1");
+        $update_stmt->bind_param("isisi", $window_id, $called_at, $called_at, $queueId, $today);
         $update_stmt->execute();
         $queueGet = $this->db->query("
                 SELECT * FROM queue_list 
@@ -826,12 +829,21 @@ class Queue
         $this->recordWaitingTime($queueId, $ticket['transaction_id']);
         $this->recordServiceStart($queueId);
         $this->recordServiceEnd($old_qid);
-        $query_stmt = $this->db->prepare("SELECT q.*, t.name as wname, ts.symbol as tsymbol 
-                                     FROM queue_list q 
-                                     INNER JOIN transaction_windows t ON t.id = q.window_id 
-                                     INNER JOIN transactions ts ON ts.id = q.transaction_id 
-                                     WHERE q.id = ? AND DATE(q.created_timestamp) = ? AND q.window_id = ? AND q.status = 1 
-                                     ORDER BY q.id DESC LIMIT 1");
+        $query_stmt = $this->db->prepare("SELECT 
+                                q.*, 
+                                t.name as wname, 
+                                ts.symbol as tsymbol,
+                                s.type as status_type  
+                              FROM 
+                                queue_list q 
+                              INNER JOIN transaction_windows t ON t.id = q.window_id 
+                              INNER JOIN transactions ts ON ts.id = q.transaction_id 
+                              LEFT JOIN status s ON s.id = q.status 
+                              WHERE DATE(q.created_timestamp) = ? 
+                                AND q.window_id = ? 
+                                AND q.status = 1 
+                              ORDER BY q.created_timestamp DESC 
+                              LIMIT 1");
         $query_stmt->bind_param("isi", $queueId, $today, $window_id);
         $query_stmt->execute();
         $result = $query_stmt->get_result();

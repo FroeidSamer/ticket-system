@@ -203,11 +203,11 @@
 							$trans = $conn->query("SELECT * FROM transactions where status = 1 AND active = 'on' order by name asc");
 							while ($row = $trans->fetch_assoc()) :
 							?>
-								<button type="button" class="btn m-btn transaction-c" 
-									data-tid="<?= $row['id'] ?>" 
-									data-symbol="<?= $row['symbol'] ?>" 
-									data-numberfrom="<?php echo $row['numberFrom']?>" 
-									data-numberto="<?php echo $row['numberTo']?>"
+								<button type="button" class="btn m-btn transaction-c"
+									data-tid="<?= $row['id'] ?>"
+									data-symbol="<?= $row['symbol'] ?>"
+									data-numberfrom="<?php echo $row['numberFrom'] ?>"
+									data-numberto="<?php echo $row['numberTo'] ?>"
 									data-show-ab="<?php echo isset($row['show_ab_selection']) ? $row['show_ab_selection'] : 'off' ?>"><?= $row['name'] ?></button>
 							<?php endwhile; ?>
 						</div>
@@ -242,7 +242,7 @@
 		$('.ab-box').removeClass('selected');
 		$(this).addClass('selected');
 		selectedAB = $(this).data('selection');
-		
+
 		// Proceed with queue registration
 		if (currentTransactionData) {
 			processQueue(currentTransactionData);
@@ -253,7 +253,7 @@
 	$('.m-btn').click(function(e) {
 		e.preventDefault();
 		var button = $(this);
-		
+
 		currentTransactionData = {
 			transaction_id: button.data('tid'),
 			transaction_symbol: button.data('symbol'),
@@ -299,7 +299,7 @@
 					end_load();
 					alert_toast("Queue Registered Successfully (Selection: " + selectedAB + ")", 'success');
 					PrintDiv(resp);
-					
+
 					// Hide A/B selection and reset
 					$('#ab-selection').slideUp();
 					selectedAB = null;
@@ -343,12 +343,12 @@
 								(resp.data.queue_no !== previousResponse.data.queue_no &&
 									resp.data.date_created !== previousResponse.data.date_created) || resp.data.recall !== previousResponse.data.recall
 							) {
-								let start = 'Ø§Ù„Ø¨Ø·Ø§Ù‚Ø© Ø±Ù‚Ù… ';
+								let start = 'البطاقة رقم ';
 								let symbol = resp.data.tsymbol;
 								let num = resp.data.queue_no;
-								let to = ' Ø¥Ù„Ù‰ ';
+								let to = ' إلى ';
 								let wnum = resp.data.wname;
-								let str = start + symbol + ' ' + num + to + wnum;
+								let str = start + symbol + ' ' + num;
 								fetch('tts/tts.php', {
 										method: 'POST',
 										headers: {

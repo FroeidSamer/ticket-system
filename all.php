@@ -215,16 +215,64 @@ include "admin/db_connect.php";
                 padding: 8px 4px;
             }
         }
+
+        .highlight-new {
+            animation: highlightFade 2s ease-in-out;
+        }
+
+        @keyframes highlightFade {
+            0% {
+                background-color: #4CAF50;
+                transform: scale(1.02);
+            }
+
+            50% {
+                background-color: #8BC34A;
+            }
+
+            100% {
+                background-color: transparent;
+                transform: scale(1);
+            }
+        }
+
+        .queue-row {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 
 <body>
 
     <?php
-    $tw_res = $conn->query("SELECT * FROM transaction_windows WHERE status = 1 ORDER BY name ASC");
+    $tw_res = $conn->query("SELECT 
+                            w.id, 
+                            w.name,
+                            w.transaction_ids AS w_transaction_ids, -- العمود الأصلي من الجدول
+                            GROUP_CONCAT(t.name SEPARATOR ', ') AS tnames, 
+                            GROUP_CONCAT(t.id SEPARATOR ',') AS calculated_transaction_ids 
+                        FROM 
+                            transaction_windows w 
+                        LEFT JOIN 
+                            transactions t 
+                            ON (
+                                (w.transaction_ids IS NOT NULL AND FIND_IN_SET(t.id, w.transaction_ids)) 
+                                OR (w.transaction_ids IS NULL AND t.id = w.transaction_id)
+                            )
+                        WHERE 
+                            w.status = 1 
+                        GROUP BY 
+                            w.id 
+                        ORDER BY 
+                            w.name ASC");
+
     $windows = [];
-    while ($r = $tw_res->fetch_assoc()) {
-        $windows[] = $r;
+    if ($tw_res) {
+        while ($r = $tw_res->fetch_assoc()) {
+            // نستخدم 'calculated_transaction_ids' إذا كانت موجودة، وإلا نستخدم العمود الأصلي
+            $r['final_tids'] = !empty($r['calculated_transaction_ids']) ? $r['calculated_transaction_ids'] : $r['w_transaction_ids'];
+            $windows[] = $r;
+        }
     }
 
     $uploads = $conn->query("SELECT * FROM file_uploads ORDER BY rand()");
@@ -256,11 +304,20 @@ include "admin/db_connect.php";
                     </thead>
                     <tbody id="queue-tbody">
                         <?php foreach ($windows as $w): ?>
-                            <tr class="queue-row" data-wid="<?= htmlspecialchars($w['id']) ?>" data-tids="<?= htmlspecialchars($w['transaction_ids']) ?>">
-                                <td class="td-clinic clinic-name">-</td> <!-- بدل td-symbol -->
+                            <?php
+                            $clinic_names = !empty($w['tnames']) ? $w['tnames'] : '-';
+                            $window_name  = !empty($w['name']) ? $w['name'] : '-';
+                            $tids         = !empty($w['final_tids']) ? $w['final_tids'] : '';
+                            $wid          = $w['id'];
+                            ?>
+                            <tr class="queue-row"
+                                data-wid="<?= htmlspecialchars($wid) ?>"
+                                data-tids="<?= htmlspecialchars($tids) ?>"
+                                data-original-clinic="<?= htmlspecialchars($clinic_names) ?>">
+                                <td class="td-clinic"><?= htmlspecialchars($clinic_names) ?></td>
                                 <td class="td-queue">-</td>
-                                <td class="td-symbol">-</td> <!-- لو حابة تظهري النوع بعد كده -->
-                                <td class="td-window"><?= htmlspecialchars($w['name']) ?></td>
+                                <td class="td-symbol">-</td> <!-- Will be populated by AJAX -->
+                                <td class="td-window"><?= htmlspecialchars($window_name) ?></td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -283,154 +340,338 @@ include "admin/db_connect.php";
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        var slides = <?= json_encode($slides) ?>;
+    <script type="text/javascript">
+        var slides = <?php echo json_encode($slides) ?>;
         var scount = slides.length;
+        if (scount > 0) {
+            $(document).ready(function() {
+                render_slides(0)
+            })
+        }
 
         function render_slides(k) {
-            if (scount === 0) return;
-            if (k >= scount) k = 0;
-            var src = slides[k];
+            if (k >= scount)
+                k = 0;
+            var src = slides[k]
             k++;
-            var ext = src.split('.').pop().toLowerCase();
+            var t = src.split('.');
             var file;
-
-            if (ext === 'webm' || ext === 'mp4') {
-                file = $("<video id='slide' src='admin/assets/uploads/" + src + "' autoplay muted playsinline onended='render_slides(" + k + ")'></video>");
+            t = t[1];
+            if (t == 'webm' || t == "mp4") {
+                file = $("<video id='slide' src='admin/assets/uploads/" + src + "' onended='render_slides(" + k + ")' autoplay='true' muted='muted'></video>");
             } else {
                 file = $("<img id='slide' src='admin/assets/uploads/" + src + "' onload='slideInterval(" + k + ")' />");
             }
-
+            //console.log(file)
             if ($('#slide').length > 0) {
                 $('#slide').css({
                     "opacity": 0
                 });
                 setTimeout(function() {
-                    $('#slide').remove();
-                    $('.slideShow').append(file);
+                    $('.slideShow').html('');
+                    $('.slideShow').append(file)
                     $('#slide').css({
                         "opacity": 1
                     });
-                }, 400);
+                    if (t == 'webm' || t == "mp4")
+                        $('video').trigger('play');
+
+
+                }, 500)
             } else {
-                $('.slideShow').append(file);
+                $('.slideShow').append(file)
                 $('#slide').css({
                     "opacity": 1
                 });
+
             }
+
         }
 
         function slideInterval(i = 0) {
             setTimeout(function() {
-                render_slides(i);
-            }, 5000);
+                render_slides(i)
+            }, 5000)
+
         }
-
-        if (scount > 0) $(function() {
-            render_slides(0);
-        });
-
 
         // ========================= START QUEUE LOGIC HERE =========================
 
-        var previousPerRow = {};
-        var rows = $('.queue-row');
+        $(document).ready(function() {
+            var previousPerRow = {};
+            var rows = $('.queue-row');
+            var windowData = [];
 
-        rows.each(function() {
-            var row = $(this);
-            var wid = row.data('wid');
-            var tids = row.data('tids');
+            // --- 1. Initialization and Data Collection ---
+            rows.each(function() {
+                var row = $(this);
+                var wid = row.data('wid');
+                var tids = row.data('tids');
 
-            previousPerRow[wid] = {
-                queue_no: '',
-                date_created: 0,
-                tsymbol: '',
-                clinic: '',
-                wname: ''
-            };
+                var originalClinicName = row.data('original-clinic') || row.find('.td-window').text();
 
-            setInterval(function() {
+                previousPerRow[wid] = {
+                    queue_no: '',
+                    date_created: 0,
+                    tsymbol: '',
+                    status_type: '',
+                    clinic: originalClinicName,
+                    wname: row.find('.td-window').text()
+                };
+
+                if (tids) {
+                    windowData.push({
+                        row: row,
+                        wid: wid,
+                        tids: tids,
+                        originalClinicName: originalClinicName
+                    });
+                }
+            });
+
+            // --- 2. Sorting Logic ---
+            function sortRowsByDateCreated() {
+                var tbody = $('#queue-tbody');
+                var rows = tbody.find('tr').get();
+
+                rows.sort(function(a, b) {
+                    var ad = parseInt($(a).data('date_created')) || 0;
+                    var bd = parseInt($(b).data('date_created')) || 0;
+
+                    // Primary sort: Date descending (most recent first - higher timestamp = more recent)
+                    if (ad !== bd) {
+                        return bd - ad;
+                    }
+                    // Secondary sort: By Window ID ascending
+                    var aid = parseInt($(a).data('wid'));
+                    var bid = parseInt($(b).data('wid'));
+                    return aid - bid;
+                });
+
+                // Append sorted rows
+                $.each(rows, function(i, row) {
+                    tbody.append(row);
+                });
+            }
+
+            // --- 3. Response Processing Helper ---
+            function processResponse(row, wid, originalClinicName, resp) {
+                var r;
+                try {
+                    r = (typeof resp === 'object') ? resp : JSON.parse(resp);
+                } catch (e) {
+                    console.error("JSON Parse Error for wid:", wid, e);
+                    return false;
+                }
+
+                var hasValidData = (r.status == 1 && r.data && r.data.queue_no && r.data.queue_no !== '0');
+                var saved = previousPerRow[wid];
+                var hasChanged = false;
+
+                if (hasValidData) {
+                    var tsymbol = r.data.tsymbol || '';
+                    var qno = r.data.queue_no || '';
+                    var clinic = r.data.clinic_name || r.data.tname || originalClinicName;
+                    var wname = r.data.wname || '';
+
+                    // Get النوع from selection column in queue_list table
+                    var displayType = r.data.display_type || r.data.queue_selection || '-';
+
+                    // Use the actual database timestamp
+                    var timestamp = r.data.timestamp_unix ? parseInt(r.data.timestamp_unix) * 1000 : parseInt(r.data.date_created) * 1000;
+
+                    // Check if this is a NEW call
+                    if (saved.queue_no !== qno || saved.date_created !== timestamp) {
+                        hasChanged = true;
+
+                        previousPerRow[wid] = {
+                            tsymbol: tsymbol,
+                            queue_no: qno,
+                            clinic: clinic,
+                            wname: wname,
+                            display_type: displayType,
+                            date_created: timestamp
+                        };
+
+                        row.find('.td-clinic').text(clinic);
+                        row.find('.td-queue').text(tsymbol + ' - ' + qno);
+                        row.find('.td-symbol').text(displayType); // Display النوع from selection column
+                        row.find('.td-window').text(wname || row.find('.td-window').text());
+                        row.data('date_created', timestamp);
+                        row.show();
+
+                        // Add visual highlight effect
+                        row.addClass('highlight-new');
+                        setTimeout(function() {
+                            row.removeClass('highlight-new');
+                        }, 2000);
+                    }
+
+                } else {
+                    // No current queue
+                    if (saved.queue_no && saved.queue_no !== '0') {
+                        hasChanged = true;
+                        previousPerRow[wid] = {
+                            queue_no: '',
+                            date_created: 0,
+                            tsymbol: '',
+                            display_type: '',
+                            clinic: originalClinicName,
+                            wname: row.find('.td-window').text()
+                        };
+
+                        row.find('.td-clinic').text(originalClinicName);
+                        row.find('.td-queue').text('-');
+                        row.find('.td-symbol').text('-');
+                        row.data('date_created', 0);
+                    }
+                }
+
+                return hasChanged;
+            }
+
+            // --- 4. Fetch Individual Window Data ---
+            function fetchQueueData(data) {
                 $.ajax({
                     url: 'admin/ajax.php?action=get_queue',
                     method: 'POST',
                     data: {
-                        id: tids,
-                        wid: wid
+                        id: data.tids,
+                        wid: data.wid
                     },
                     success: function(resp) {
-                        try {
-                            var r = (typeof resp === 'object') ? resp : JSON.parse(resp);
-                        } catch (e) {
-                            return;
+                        var hasChanged = processResponse(data.row, data.wid, data.originalClinicName, resp);
+
+                        // Sort immediately if there was a change
+                        if (hasChanged) {
+                            sortRowsByDateCreated();
                         }
-
-                        if (r.status == 1 && r.data) {
-
-                            var tsymbol = r.data.tsymbol || '';
-                            var qno = r.data.queue_no || '';
-                            var clinic = r.data.clinic_name || r.data.tname || '';
-                            var wname = r.data.wname || '';
-                            var date_created = r.data.date_created || '';
-
-                            // ✅ تحويل التاريخ لرقم قابل للترتيب
-                            var timestamp = Date.parse(date_created) || 0;
-
-                            previousPerRow[wid] = {
-                                tsymbol: tsymbol,
-                                queue_no: qno,
-                                clinic: clinic,
-                                wname: wname,
-                                date_created: timestamp
-                            };
-                        }
-
-                        var saved = previousPerRow[wid];
-
-                        //  لو فيه بيانات يظهر الصف
-                        if (saved.queue_no && saved.queue_no !== '0') {
-
-                            row.find('.td-clinic').text(saved.clinic || row.find('.td-window').text());
-                            row.find('.td-queue').text(saved.tsymbol + ' - ' + saved.queue_no);
-                            row.find('.td-symbol').text(saved.tsymbol || '-');
-                            row.find('.td-window').text(saved.wname || row.find('.td-window').text());
-
-                            //  نحفظ التاريخ في الـ DOM كرقم
-                            row.data('date_created', parseInt(saved.date_created));
-
-                            row.show();
-                        } else {
-                            row.hide();
-                        }
-
-                        //  ترتيب كل الصفوف بعد التحديث
-                        sortRowsByDateCreated();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("AJAX Error for wid:", data.wid, "Status:", status, "Error:", error);
                     }
                 });
-            }, 2000);
+            }
+
+            // --- 5. Centralized Fetch Function ---
+            function fetchAllQueueData() {
+                // Fetch data for each window
+                windowData.forEach(function(data) {
+                    fetchQueueData(data);
+                });
+            }
+
+            // --- 6. Start Polling ---
+            if (windowData.length > 0) {
+                fetchAllQueueData(); // Initial fetch
+                setInterval(fetchAllQueueData, 5000); // Poll every 5 seconds
+            }
         });
+        // ========================= END QUEUE LOGIC HERE =========================
+
+        $(document).ready(function() {
+
+            $('.singleCard').each(function() {
+                var card = $(this);
+                var tid = card.data('tid');
+                var wid = card.data('wid');
+
+                var previousResponse;
 
 
-        //  ترتيب الأحدث فوق مع الحفاظ على كل الصفوف
-        function sortRowsByDateCreated() {
-            var tbody = $('#queue-tbody');
-            var rows = tbody.find('tr').get(); // مهم: بدون :visible
+                var renderServe = setInterval(function() {
+                    $.ajax({
+                        url: 'admin/ajax.php?action=get_queue',
+                        method: "POST",
+                        data: {
+                            id: tid,
+                            wid: wid
+                        },
+                        success: function(resp) {
+                            try {
+                                parsedResp = JSON.parse(resp);
+                            } catch (error) {
+                                // Handle non-JSON response here
+                                return;
+                            }
+                            resp = JSON.parse(resp);
+                            if (resp.status == 1) {
+                                card.find('#squeue').html(resp.data.tsymbol + resp.data.queue_no);
+                                card.find('#window').html(resp.data.wname);
 
-            rows.sort(function(a, b) {
-                var ad = $(a).data('date_created') || 0;
-                var bd = $(b).data('date_created') || 0;
-                return bd - ad; // الأحدث فوق
+                                previousResponse = resp;
+                            }
+                        }
+                    });
+                }, 2000);
             });
+            // var renderTranss = setInterval(function() {
+            //   location.reload();
+            // }, 60000);
+            //get trans sound
+            $(document).ready(function() {
 
-            $.each(rows, function(i, row) {
-                tbody.append(row);
-                //  لو الصف مش فيه رقم دور → نخفيه بعد وضعه في مكانه الصحيح
-                if ($(row).find('.td-queue').text().trim() === '-' || $(row).find('.td-queue').text().trim() === '') {
-                    $(row).hide();
-                } else {
-                    $(row).show();
-                }
+                $('.transaction-x').each(function() {
+                    var card = $(this);
+                    var tid = card.data('tid');
+
+                    var previousResponse = {
+                        status: '',
+                        data: {
+                            queue_no: '',
+                            date_created: '',
+                            recall: ''
+                        }
+                    };
+
+                    var renderServe = setInterval(function() {
+                        $.ajax({
+                            url: 'admin/ajax.php?action=get_queue_sound',
+                            method: "POST",
+                            data: {
+                                id: tid
+                            },
+                            success: function(resp) {
+                                try {
+                                    parsedResp = JSON.parse(resp);
+                                } catch (error) {
+                                    return;
+                                }
+                                resp = JSON.parse(resp);
+                                if (resp.status == 1) {
+                                    if (
+                                        (resp.data.queue_no !== previousResponse.data.queue_no &&
+                                            resp.data.date_created !== previousResponse.data.date_created) || resp.data.recall !== previousResponse.data.recall
+                                    ) {
+                                        let start = 'البطاقة رقم ';
+                                        let symbol = resp.data.tsymbol;
+                                        let num = resp.data.queue_no;
+                                        let to = ' إلى ';
+                                        let wnum = resp.data.wname;
+                                        let str = start + symbol + ' ' + num;
+                                        fetch('tts/tts.php', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                                },
+                                                body: 'text=' + encodeURIComponent(str)
+                                            })
+
+                                            .catch(error => {
+                                                console.error('AJAX request failed:', error);
+                                            });
+
+                                    }
+
+                                    previousResponse = resp;
+                                }
+                            }
+                        });
+                    }, 2000);
+                });
+
             });
-        }
+        });
     </script>
 
 </body>
