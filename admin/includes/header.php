@@ -31,6 +31,37 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
     }
 }
 
+if (isset($_GET['reset_queue']) && $_GET['reset_queue'] === 'true' && $_SESSION['login_type'] == 1) {
+    try {
+        $today = date("Y-m-d");
+
+        // Prepare the DELETE statement
+        $stmt = $conn->prepare(
+            "DELETE FROM queue_list WHERE DATE(created_timestamp) = ?"
+        );
+
+        if (!$stmt) {
+            throw new Exception("Database prepare failed: " . $conn->error);
+        }
+
+        $stmt->bind_param("s", $today);
+        $stmt->execute();
+
+        $affected_rows = $stmt->affected_rows;
+        $stmt->close();
+
+        // Set a success message
+        $_SESSION['queue_message'] = "✅ Successfully reset queues. Deleted {$affected_rows} entries.";
+    } catch (Exception $e) {
+        // Set an error message
+        $_SESSION['queue_message'] = "❌ Error resetting queues: " . $e->getMessage();
+    }
+
+    // Crucial step: Redirect to clear the GET parameter from the URL
+    // This prevents the reset from running every time the user refreshes the page.
+    header('location: index.php?page=home');
+    die();
+}
 
 ?>
 <!DOCTYPE html>
@@ -212,8 +243,8 @@ WHERE tw.id = " . (int)$_SESSION['login_window_id']);
                                 <i class="fas fa-database"></i><?= tr('Export_SQL_database') ?>
                             </a>
                             <h6 class="collapse-header"><?= tr('waiting_counter') ?>:</h6>
-                            <a href="#" class="collapse-item" id="exportLink" onclick="(event)">
-                                </i> <?= tr('Reset_Counter') ?>
+                            <a href="index.php?page=home&reset_queue=true" class="collapse-item" id="exportLink" onclick="return confirm('Are you sure you want to reset all of today\'s queue numbers? This cannot be undone.');">
+                                <i class="fa fa-trash"></i> <?= tr('Reset_Counter') ?>
                             </a>
                         </div>
                     </div>
