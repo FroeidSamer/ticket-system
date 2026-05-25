@@ -66,7 +66,14 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - 🧱 Code restructuring planned
 
 ## 📸 Screenshots
-(Add screenshots here)
+<img width="1901" height="939" alt="1" src="https://github.com/user-attachments/assets/cf3bf1c5-305c-4d45-9b68-e8357e0dfa70" />
+<img width="1902" height="940" alt="2" src="https://github.com/user-attachments/assets/a56a1fc3-d703-4ce3-87a1-782668e5d342" />
+<img width="1900" height="939" alt="3" src="https://github.com/user-attachments/assets/f78b999e-abf7-450f-8848-14e47ddc36f4" />
+<img width="1902" height="945" alt="4" src="https://github.com/user-attachments/assets/bcfc32c8-f776-4727-a46d-e04034d80266" />
+<img width="1898" height="944" alt="5" src="https://github.com/user-attachments/assets/c79a202d-8d2a-46a4-b0b6-0283dd9d2de6" />
+<img width="1893" height="929" alt="6" src="https://github.com/user-attachments/assets/5f0d1971-a665-4788-8fd2-b61eacb8dfe4" />
+<img width="1899" height="949" alt="7" src="https://github.com/user-attachments/assets/762b3a65-187e-4b78-8905-628dbb56b982" />
+<img width="1899" height="939" alt="8" src="https://github.com/user-attachments/assets/a7260a46-f359-4e26-a1a2-ec608256a7fe" />
 
 ## 📝 Project Details
 
