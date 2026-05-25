@@ -7,15 +7,11 @@ The system was originally developed using PHP and runs on a local XAMPP environm
 
 The goal of this project is to **rebuild and enhance the system using clean and professional PHP architecture** while maintaining the original workflow.
 
----
-
 ## 👥 Team Members
 - Islam Nabil  
 - Osama Sayed  
 - Froeid Samer  
 - Basma Reda  
-
----
 
 ## 🎯 Project Objectives
 
@@ -25,8 +21,6 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - Provide a simple and user-friendly interface for staff and patients
 - Ensure system stability, scalability, and maintainability
 - Apply secure coding practices and performance optimization
-
----
 
 ## ⚙️ System Features
 
@@ -39,16 +33,12 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - ✅ Patient transfer between doctors or clinics
 - ✅ Configurable system for different medical environments
 
----
-
 ## 🛠 Technologies Used
 
 - Frontend: HTML5, CSS3, Bootstrap, JavaScript
 - Backend: PHP
 - Database: MySQL
 - Environment: XAMPP (Local Development)
-
----
 
 ## 🧩 System Modules
 
@@ -68,8 +58,6 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - Transfer patient to another clinic/doctor
 - Manage queue workflow
 
----
-
 ## 🚀 Project Status
 
 - 🔄 Under improvement and refactoring
@@ -77,12 +65,8 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - ⚡ Performance optimization ongoing
 - 🧱 Code restructuring planned
 
----
-
 ## 📸 Screenshots
 (Add screenshots here)
-
----
 
 ## 📝 Project Details
 
@@ -90,8 +74,6 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - Category: PHP Full System
 - Environment: XAMPP Local Server
 - Duration: [Add Real Duration]
-
----
 
 ## ✨ Key Highlights
 
@@ -101,20 +83,16 @@ The goal of this project is to **rebuild and enhance the system using clean and 
 - Scalable architecture for clinics/hospitals
 - Focus on usability and system reliability
 
----
+## 🔗 Links
+- GitHub Repository: https://github.com/FroeidSamer/ticket-system
 
 ## 👨‍💻 Author
 
-**Froeid Samer**  
+Froeid Samer  
 Frontend & WordPress Developer  
 
 LinkedIn:  
 https://www.linkedin.com/in/froeid-samer-9a50a9300/
-
-Portfolio:  
-https://froeid-portfolio.vercel.app
-
----
 
 ## 📄 License
 This project is for educational and portfolio purposes. All rights reserved.
